@@ -1,9 +1,17 @@
 %{
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include "crb_string.h"
+#include "crb_type.h"
+#include "crb_expression.h"
+#include "y.tab.h"
 
 static struct crb_string str;
+
+int yywrap(void)
+{
+	return 1;
+}
 
 %}
 
@@ -14,23 +22,39 @@ FLOAT (0?|{INTEGER})\.[0-9]+
 
 %%
 
-<INITIAL>^{INTEGER}$ {
-	int v = 0;
-	sscanf(yytext, "%d", &v);
-	printf("integer: %d\n", v);
+<INITIAL>"("            return LP;
+<INITIAL>")"            return RP;
+<INITIAL>"&&"           return LOGICAL_AND;
+<INITIAL>"||"           return LOGICAL_OR;
+<INITIAL>"="            return ASSIGN;
+<INITIAL>"=="           return EQ;
+<INITIAL>"!="           return NE;
+<INITIAL>">"            return GT;
+<INITIAL>">="           return GE;
+<INITIAL>"<"            return LT;
+<INITIAL>"<="           return LE;
+<INITIAL>"+"            return ADD;
+<INITIAL>"-"            return SUB;
+<INITIAL>"*"            return MUL;
+<INITIAL>"/"            return DIV;
+<INITIAL>"%"            return MOD;
+
+<INITIAL>[_a-zA-Z][_a-zA-Z0-9]* {
+	yylval.identifier = yytext;
+
+	return IDENTIFIER;
 }
 
-<INITIAL>^{FLOAT}$ {
-	double v = 0;
-	sscanf(yytext, "%lf", &v);
-	printf("float: %lf\n", v);
+<INITIAL>{INTEGER}|"0" {
+	yylval.expression = crb_create_int_expression(atoi(yytext));
+
+	return INTEGER_LITERAL;
 }
 
-<INITIAL>^[_a-zA-Z][_a-zA-Z0-9]*$ {
-	printf("identifer: %s\n", yytext);
-}
+<INITIAL>{FLOAT} {
+	yylval.expression = crb_create_double_expression(atof(yytext));
 
-<INITIAL>\n {
+	return FLOAT_LITERAL;
 }
 
 <INITIAL>\" {
@@ -41,38 +65,57 @@ FLOAT (0?|{INTEGER})\.[0-9]+
 	BEGIN(STRING);
 }
 
+<INITIAL>[ \t] {
+}
+
+<INITIAL>\n {
+}
+
 <INITIAL>. {
 	printf("%s\n", yytext);
 }
 
 <STRING>\" {
-	printf("string: %s\n", str.data);
-	free(str.data);
-	memset(&str, 0, sizeof(str));
+	yylval.expression = crb_create_string_expression(str);
+
 	BEGIN(INITIAL);
+
+	return STRING_LITERAL;
 }
 
 <STRING>"\\\\" {
-	crb_string_append_char(&str, '\\');
+	if (crb_string_append_char(&str, '\\') != 0) {
+		exit(1);
+	}
 }
 
 <STRING>"\\\"" {
-	crb_string_append_char(&str, '\"');
+	if (crb_string_append_char(&str, '\"') != 0) {
+		exit(1);
+	}
 }
 
 <STRING>"\\n" {
-	crb_string_append_char(&str, '\n');
+	if (crb_string_append_char(&str, '\n') != 0) {
+		exit(1);
+	}
 }
 
 <STRING>"\\t" {
-	crb_string_append_char(&str, '\t');
+	if (crb_string_append_char(&str, '\t') != 0) {
+		exit(1);
+	}
 }
 
 <STRING>"\\b" {
-	crb_string_append_char(&str, '\b');
+	if (crb_string_append_char(&str, '\b') != 0) {
+		exit(1);
+	}
 }
 
 <STRING>. {
-	crb_string_append_char(&str, yytext[0]);
+	if (crb_string_append_char(&str, yytext[0]) != 0) {
+		exit(1);
+	}
 }
 
