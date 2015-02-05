@@ -5,6 +5,7 @@
 
 enum {
 	CRB_EXPRESSION_NONE,
+	CRB_BOOLEAN_EXPRESSION,
 	CRB_INT_EXPRESSION,
 	CRB_DOUBLE_EXPRESSION,
 	CRB_STRING_EXPRESSION,
@@ -50,6 +51,7 @@ struct crb_minus_expression {
 struct crb_expression {
 	int type;
 	union {
+		int boolean_value;
 		int int_value;
 		double double_value;
 		char *identifier;
@@ -62,9 +64,20 @@ struct crb_expression {
 
 #define crb_expression_type_is_valid(_t_) ((_t_) > CRB_EXPRESSION_NONE\
 		&& (_t_) <= CRB_MINUS_EXPRESSION)
-#define crb_binary_expression_operator_is_valid(_o_) (\
+
+#define crb_is_valid_binary_operator(_o_) (\
 		(_o_) > CRB_BINARY_OPERATOR_NONE\
 		&& (_o_) <= CRB_BINARY_OPERATOR_LOGICAL_OR)
+
+#define crb_is_comparison_operator(_o_) (\
+		(_o_) == CRB_BINARY_OPERATOR_GT\
+		|| (_o_) == CRB_BINARY_OPERATOR_GE\
+                || (_o_) == CRB_BINARY_OPERATOR_LT\
+                || (_o_) == CRB_BINARY_OPERATOR_LE)
+
+#define crb_is_equality_operator(_o_) (\
+		(_o_) == CRB_BINARY_OPERATOR_EQ\
+		|| (_o_) == CRB_BINARY_OPERATOR_NE)
 
 extern struct crb_expression *crb_create_expression(int type, void *value);
 
@@ -72,6 +85,12 @@ extern struct crb_expression *crb_create_expression(int type, void *value);
 	int v = (_v_);\
 	crb_create_expression(CRB_INT_EXPRESSION, &v);\
 })
+
+#define crb_create_boolean_expression(_v_) ({\
+	int v = (_v_);\
+	crb_create_expression(CRB_BOOLEAN_EXPRESSION, &v);\
+})
+
 #define crb_create_double_expression(_v_) ({\
 	double v = (_v_);\
 	crb_create_expression(CRB_DOUBLE_EXPRESSION, &v);\

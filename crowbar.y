@@ -17,6 +17,7 @@
 
 %token 	<expression> INTEGER_LITERAL FLOAT_LITERAL STRING_LITERAL
 %token 	<identifier> IDENTIFIER
+%token 	<expression> TRUE FALSE
 %token 	ADD SUB MUL DIV MOD LP RP GT GE LT LE EQ NE LOGICAL_AND LOGICAL_OR ASSIGN SEMICOLON
 %type 	<expression> expression logical_or_expression logical_and_expression
 	equality_expression relational_expression additive_expression
@@ -124,6 +125,8 @@ primary_expression
 	| INTEGER_LITERAL
 	| FLOAT_LITERAL
 	| STRING_LITERAL
+	| TRUE
+	| FALSE
 	;
 %%
 

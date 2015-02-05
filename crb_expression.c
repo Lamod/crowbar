@@ -3,7 +3,7 @@
 #include "util/crb_util.h"
 
 static char *exp_type_desc[] = {
-	"NONE", "INT", "DOUBLE", "STRING",
+	"NONE", "BOOL", "INT", "DOUBLE", "STRING",
 	"IDENTIFIER", "BINARY", "ASSIGN", "MINUS",
 };
 
@@ -29,6 +29,12 @@ struct crb_expression *crb_create_expression(int type, void *value)
 	printf("%s t:%s v:", __func__, exp_type_desc[type]);
 
 	switch (type) {
+	case CRB_BOOLEAN_EXPRESSION:
+	{
+		printf("%d\n", V(int));
+		SETV(boolean_value);
+	}
+		break;
 	case CRB_INT_EXPRESSION:
 	{
 		printf("%d\n", V(int));

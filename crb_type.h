@@ -14,6 +14,7 @@ extern size_t crb_string_append_chars(struct crb_string *str, char *chars);
 
 enum {
 	CRB_NULL_VALUE,
+	CRB_BOOLEAN_VALUE,
 	CRB_INT_VALUE,
 	CRB_DOUBLE_VALUE,
 	CRB_STRING_VALUE,
@@ -22,6 +23,7 @@ enum {
 struct crb_value {
 	int type;
 	union {
+		int boolean_value;
 		int int_value;
 		double float_value;
 		struct crb_string string_value;
@@ -32,6 +34,7 @@ extern void crb_value_print(struct crb_value v);
 
 #define CRB_NULL ((struct crb_value){0})
 
+#define crb_is_boolean_value(_v_) ((_v_).type == CRB_BOOLEAN_VALUE)
 #define crb_is_numberical_value(_v_) ((_v_).type == CRB_INT_VALUE\
 		|| (_v_).type == CRB_DOUBLE_VALUE)
 

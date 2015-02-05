@@ -39,6 +39,18 @@ FLOAT (0?|{INTEGER})\.[0-9]+
 <INITIAL>"/"            return DIV;
 <INITIAL>"%"            return MOD;
 <INITIAL>";"		return SEMICOLON;
+<INITIAL>"true" {
+	yylval.expression = crb_create_boolean_expression(1);
+
+	return TRUE;
+}
+
+<INITIAL>"false" {
+	yylval.expression = crb_create_boolean_expression(0);
+
+	return FALSE;
+}
+
 
 <INITIAL>[_a-zA-Z][_a-zA-Z0-9]* {
 	yylval.identifier = yytext;
