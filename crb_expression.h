@@ -60,6 +60,12 @@ struct crb_expression {
 	} u;
 };
 
+#define crb_expression_type_is_valid(_t_) ((_t_) > CRB_EXPRESSION_NONE\
+		&& (_t_) <= CRB_MINUS_EXPRESSION)
+#define crb_binary_expression_operator_is_valid(_o_) (\
+		(_o_) > CRB_BINARY_OPERATOR_NONE\
+		&& (_o_) <= CRB_BINARY_OPERATOR_LOGICAL_OR)
+
 extern struct crb_expression *crb_create_expression(int type, void *value);
 
 #define crb_create_int_expression(_v_) ({\
@@ -82,7 +88,8 @@ extern struct crb_expression *crb_create_binary_expression(int opr,
 extern struct crb_expression *crb_create_assign_expression(char *variable,
 		const struct crb_expression *exprand);
 
-extern struct crb_expression *crb_create_minus_expression(const struct crb_expression *exp);
+extern struct crb_expression *crb_create_minus_expression(
+		const struct crb_expression *exp);
 
 #endif // CRB_EXPRESSION_H
 

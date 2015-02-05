@@ -38,6 +38,7 @@ FLOAT (0?|{INTEGER})\.[0-9]+
 <INITIAL>"*"            return MUL;
 <INITIAL>"/"            return DIV;
 <INITIAL>"%"            return MOD;
+<INITIAL>";"		return SEMICOLON;
 
 <INITIAL>[_a-zA-Z][_a-zA-Z0-9]* {
 	yylval.identifier = yytext;

@@ -23,8 +23,8 @@ struct crb_expression *crb_create_expression(int type, void *value)
 
 	e->type = type;
 
-	#define V(_t_) (*((_t_ *)value))
-	#define SETV(_f_) (e->u._f_ = V(typeof(e->u._f_)))
+#define V(_t_) (*((_t_ *)value))
+#define SETV(_f_) (e->u._f_ = V(typeof(e->u._f_)))
 
 	printf("%s t:%s v:", __func__, exp_type_desc[type]);
 
@@ -76,6 +76,9 @@ struct crb_expression *crb_create_expression(int type, void *value)
 		break;
 	}
 
+#undef V
+#undef SETV
+
 	return e;
 }
 
@@ -108,7 +111,8 @@ struct crb_expression *crb_create_assign_expression(char *variable,
 	return crb_create_expression(CRB_ASSIGN_EXPRESSION, &ae);
 }
 
-struct crb_expression *crb_create_minus_expression(const struct crb_expression *exp)
+struct crb_expression *crb_create_minus_expression(
+		const struct crb_expression *exp)
 {
 	crb_assert(exp != NULL, return NULL);
 

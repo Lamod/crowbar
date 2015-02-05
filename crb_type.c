@@ -51,3 +51,24 @@ size_t crb_string_append_chars(struct crb_string *str, char *chars)
 	while (i < l && crb_string_append_char(str, chars[i++]) == 0) {}
 	return i;
 }
+
+void crb_value_print(struct crb_value v)
+{
+	switch(v.type) {
+	case CRB_NULL_VALUE:
+		printf("null");
+		break;
+	case CRB_INT_VALUE:
+		printf("int: %d", v.u.int_value);
+		break;
+	case CRB_DOUBLE_VALUE:
+		printf("double: %f", v.u.float_value);
+		break;
+	case CRB_STRING_VALUE:
+		printf("string: %s", v.u.string_value.data);
+		break;
+	default:
+		printf("unknown type: %d", v.type);
+		break;
+	}
+}

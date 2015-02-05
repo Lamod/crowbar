@@ -1,24 +1,37 @@
 %{
+
 #include <stdio.h>
 #include "crb_type.h"
 #include "crb_expression.h"
+#include "crb_statement.h"
+#include "crb_eval_exp.h"
+
 %}
 
 %union {
 	char *identifier;
 
 	struct crb_expression *expression;
+	struct crb_statement *statement;
 }
 
 %token 	<expression> INTEGER_LITERAL FLOAT_LITERAL STRING_LITERAL
 %token 	<identifier> IDENTIFIER
-%token 	ADD SUB MUL DIV MOD LP RP GT GE LT LE EQ NE LOGICAL_AND LOGICAL_OR ASSIGN
+%token 	ADD SUB MUL DIV MOD LP RP GT GE LT LE EQ NE LOGICAL_AND LOGICAL_OR ASSIGN SEMICOLON
 %type 	<expression> expression logical_or_expression logical_and_expression
 	equality_expression relational_expression additive_expression
 	multiplicative_expression unary_expression primary_expression
+%type	<statement> statement
 
 %%
 
+statement
+	:expression SEMICOLON
+	{
+		$$ = crb_create_exp_statement($1);
+		crb_eval_exp(NULL, $1);
+	}
+	;
 expression
 	: logical_or_expression
 	| IDENTIFIER ASSIGN expression
