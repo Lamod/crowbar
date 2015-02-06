@@ -26,6 +26,10 @@
 
 %%
 
+statement_list
+	:statement
+	|statement_list statement
+	;
 statement
 	:expression SEMICOLON
 	{
