@@ -134,6 +134,36 @@ static struct crb_value cal_equality_exp(struct crb_interpreter *itp,
 	printf("\n");
 	return v;
 }
+
+static struct crb_value cal_logical_exp(struct crb_interpreter *itp,
+		struct crb_value left,
+		struct crb_value right,
+		int operator)
+{
+//	crb_assert(exp != NULL && itp != NULL, return CRB_NULL);
+	crb_assert(operator == CRB_BINARY_OPERATOR_LOGICAL_OR
+			|| operator == CRB_BINARY_OPERATOR_LOGICAL_AND,
+			return CRB_NULL);
+
+	if (!crb_is_boolean_value(left) || !crb_is_boolean_value(right)) {
+		assert(0);
+	}
+
+	struct crb_value v = {.type = CRB_BOOLEAN_VALUE};
+
+	if (operator == CRB_BINARY_OPERATOR_LOGICAL_OR) {
+		v.u.boolean_value = left.u.boolean_value || right.u.boolean_value;
+	} else {
+		v.u.boolean_value = left.u.boolean_value || right.u.boolean_value;
+	}
+
+	printf("%s ", __func__);
+	crb_value_print(v);
+	printf("\n");
+
+	return v;
+}
+
 	
 static struct crb_value eval_binary_exp(struct crb_interpreter *itp,
 		const struct crb_binary_expression *exp)
@@ -177,6 +207,10 @@ static struct crb_value eval_binary_exp(struct crb_interpreter *itp,
 	case CRB_BINARY_OPERATOR_NE:
 	case CRB_BINARY_OPERATOR_EQ:
 		v = cal_equality_exp(itp, l, r, exp->binary_operator);
+		break;
+	case CRB_BINARY_OPERATOR_LOGICAL_OR:
+	case CRB_BINARY_OPERATOR_LOGICAL_AND:
+		v = cal_logical_exp(itp, l, r, exp->binary_operator);
 		break;
 	default:
 		break;
