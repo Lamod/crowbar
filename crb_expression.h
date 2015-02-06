@@ -12,7 +12,7 @@ enum {
 	CRB_IDENTIFIER_EXPRESSION,
 	CRB_BINARY_EXPRESSION,
 	CRB_ASSIGN_EXPRESSION,
-	CRB_MINUS_EXPRESSION,
+	CRB_UNARY_EXPRESSION,
 };
 
 enum {
@@ -32,6 +32,12 @@ enum {
 	CRB_BINARY_OPERATOR_LOGICAL_OR,
 };
 
+enum {
+	CRB_UNARY_OPERATOR_NONE,
+	CRB_UNARY_OPERATOR_MINUS,
+	CRB_UNARY_OPERATOR_INVERT,
+};
+
 struct crb_expression;
 
 struct crb_binary_expression {
@@ -44,7 +50,8 @@ struct crb_assign_expression {
 	const struct crb_expression *exprand;
 };
 
-struct crb_minus_expression {
+struct crb_unary_expression {
+	int unary_operator;
 	const struct crb_expression *expression;
 };
 
@@ -58,16 +65,20 @@ struct crb_expression {
 		struct crb_string string_value;
 		struct crb_binary_expression binary_expression;
 		struct crb_assign_expression assign_expression;
-		struct crb_minus_expression minus_expression;
+		struct crb_unary_expression unary_expression;
 	} u;
 };
 
 #define crb_expression_type_is_valid(_t_) ((_t_) > CRB_EXPRESSION_NONE\
-		&& (_t_) <= CRB_MINUS_EXPRESSION)
+		&& (_t_) <= CRB_UNARY_EXPRESSION)
 
 #define crb_is_valid_binary_operator(_o_) (\
 		(_o_) > CRB_BINARY_OPERATOR_NONE\
 		&& (_o_) <= CRB_BINARY_OPERATOR_LOGICAL_OR)
+
+#define crb_is_valid_unary_operator(_o_) (\
+		(_o_) > CRB_UNARY_OPERATOR_NONE\
+		&& (_o_) <= CRB_UNARY_OPERATOR_INVERT)
 
 #define crb_is_comparison_operator(_o_) (\
 		(_o_) == CRB_BINARY_OPERATOR_GT\
@@ -107,7 +118,7 @@ extern struct crb_expression *crb_create_binary_expression(int opr,
 extern struct crb_expression *crb_create_assign_expression(char *variable,
 		const struct crb_expression *exprand);
 
-extern struct crb_expression *crb_create_minus_expression(
+extern struct crb_expression *crb_create_unary_expression(int opr,
 		const struct crb_expression *exp);
 
 #endif // CRB_EXPRESSION_H

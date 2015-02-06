@@ -28,6 +28,7 @@ FLOAT (0?|{INTEGER})\.[0-9]+
 <INITIAL>"||"           return LOGICAL_OR;
 <INITIAL>"="            return ASSIGN;
 <INITIAL>"=="           return EQ;
+<INITIAL>"!"		return INVERT;
 <INITIAL>"!="           return NE;
 <INITIAL>">"            return GT;
 <INITIAL>">="           return GE;

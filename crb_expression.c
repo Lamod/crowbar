@@ -4,7 +4,7 @@
 
 static char *exp_type_desc[] = {
 	"NONE", "BOOL", "INT", "DOUBLE", "STRING",
-	"IDENTIFIER", "BINARY", "ASSIGN", "MINUS",
+	"IDENTIFIER", "BINARY", "ASSIGN", "UNARY",
 };
 
 static char *binary_operator_desc[] = {
@@ -12,9 +12,13 @@ static char *binary_operator_desc[] = {
 	"GE", "LT", "LE", "EQ", "NE", "LOGICAL_ADD", "LOGICAL_OR",
 };
 
+static char *unary_operator_desc[] = {
+	"NONE", "MINUS", "INVERT"
+};
+
 struct crb_expression *crb_create_expression(int type, void *value)
 {
-	crb_assert(type <= CRB_ASSIGN_EXPRESSION, return NULL);
+	crb_assert(crb_expression_type_is_valid(type), return NULL);
 
 	struct crb_expression *e = malloc(sizeof(struct crb_expression));
 	if (e == NULL) {
@@ -66,10 +70,11 @@ struct crb_expression *crb_create_expression(int type, void *value)
 		SETV(assign_expression);
 	}
 		break;
-	case CRB_MINUS_EXPRESSION:
+	case CRB_UNARY_EXPRESSION:
 	{
-		printf("unknown\n");
-		SETV(minus_expression);
+		int opr = ((struct crb_unary_expression *)value)->unary_operator;
+		printf("<%s>\n", unary_operator_desc[opr]);
+		SETV(unary_expression);
 	}
 		break;
 	case CRB_IDENTIFIER_EXPRESSION:
@@ -92,7 +97,7 @@ struct crb_expression *crb_create_binary_expression(int opr,
 		const struct crb_expression *left,
 		const struct crb_expression *right)
 {
-	crb_assert(opr <= CRB_BINARY_OPERATOR_LOGICAL_OR, return NULL);
+	crb_assert(crb_is_valid_binary_operator(opr), return NULL);
 	crb_assert(left != NULL && right != NULL, return NULL);
 
 	struct crb_binary_expression be = {
@@ -117,14 +122,16 @@ struct crb_expression *crb_create_assign_expression(char *variable,
 	return crb_create_expression(CRB_ASSIGN_EXPRESSION, &ae);
 }
 
-struct crb_expression *crb_create_minus_expression(
+struct crb_expression *crb_create_unary_expression(int opr,
 		const struct crb_expression *exp)
 {
 	crb_assert(exp != NULL, return NULL);
+	crb_assert(crb_is_valid_unary_operator(opr), return NULL);
 
-	struct crb_minus_expression me = {
+	struct crb_unary_expression ue = {
+		.unary_operator = opr,
 		.expression = exp
 	};
 
-	return crb_create_expression(CRB_MINUS_EXPRESSION, &me);
+	return crb_create_expression(CRB_UNARY_EXPRESSION, &ue);
 }
