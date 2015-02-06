@@ -166,7 +166,7 @@ static struct crb_value eval_binary_exp(struct crb_interpreter *itp,
 		}
 
 		v.type = CRB_INT_VALUE;
-		v.u.int_value = l.u.int_value + r.u.float_value;
+		v.u.int_value = l.u.int_value % r.u.int_value;
 		break;
 	case CRB_BINARY_OPERATOR_GT:
 	case CRB_BINARY_OPERATOR_GE:
