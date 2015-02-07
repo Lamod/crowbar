@@ -90,6 +90,7 @@ FLOAT (0?|{INTEGER})\.[0-9]+
 }
 
 <STRING>\" {
+	printf("%s %s \n", __func__, str.data);
 	yylval.expression = crb_create_string_expression(str);
 
 	BEGIN(INITIAL);
@@ -98,37 +99,38 @@ FLOAT (0?|{INTEGER})\.[0-9]+
 }
 
 <STRING>"\\\\" {
-	if (crb_string_append_char(&str, '\\') != 0) {
+	if (crb_string_append_char(&str, '\\') <= 0) {
 		exit(1);
 	}
 }
 
 <STRING>"\\\"" {
-	if (crb_string_append_char(&str, '\"') != 0) {
+	if (crb_string_append_char(&str, '\"') <= 0) {
 		exit(1);
 	}
 }
 
 <STRING>"\\n" {
-	if (crb_string_append_char(&str, '\n') != 0) {
+	if (crb_string_append_char(&str, '\n') <= 0) {
 		exit(1);
 	}
 }
 
 <STRING>"\\t" {
-	if (crb_string_append_char(&str, '\t') != 0) {
+	if (crb_string_append_char(&str, '\t') <= 0) {
 		exit(1);
 	}
 }
 
 <STRING>"\\b" {
-	if (crb_string_append_char(&str, '\b') != 0) {
+	if (crb_string_append_char(&str, '\b') <= 0) {
 		exit(1);
 	}
 }
 
 <STRING>. {
-	if (crb_string_append_char(&str, yytext[0]) != 0) {
+	if (crb_string_append_char(&str, yytext[0]) <= 0) {
+		printf("error crb_string_append_char\n");
 		exit(1);
 	}
 }

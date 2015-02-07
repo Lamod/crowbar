@@ -1,6 +1,7 @@
 TARGET=crowbar
 CC=clang
 OBJS=\
+     util/crb_trunk.o \
      crb_type.o \
      crb_expression.o \
      crb_statement.o \
@@ -8,7 +9,7 @@ OBJS=\
      y.tab.o \
      lex.yy.o \
      main.o
-INCLUDES=crb_expression.h crb_type.h crb_statement.h
+INCLUDES=crb_expression.h crb_type.h crb_statement.h util/crb_trunk.h
 
 $(TARGET):$(OBJS)
 	$(CC) $(OBJS) -o $(TARGET)
@@ -24,6 +25,7 @@ y.tab.c: crowbar.y
 
 y.tab.o: y.tab.c y.tab.h $(INCLUDES)
 lex.yy.o: lex.yy.c $(INCLUDES)
+util/crb_trunk.o: util/crb_trunk.c $(INCLUDES)
 crb_type.o: crb_type.c $(INCLUDES)
 crb_expression.o: crb_expression.c $(INCLUDES)
 crb_statement.o: crb_statement.c $(INCLUDES)

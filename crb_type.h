@@ -1,11 +1,11 @@
 #ifndef CRB_TYPE_H
 #define CRB_TYPE_H
 
+#include "util/crb_trunk.h"
 #include <stdlib.h>
 
 struct crb_string {
-	size_t capacity, length;
-	char *data;
+	CRB_TRUNK_HEADER;
 };
 
 extern int crb_string_init(struct crb_string *str, size_t capacity);
