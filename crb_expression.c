@@ -18,6 +18,7 @@ static char *unary_operator_desc[] = {
 
 struct crb_expression *crb_create_expression(int type, void *value)
 {
+	printf("%s %d %p\n", __func__, type, value);
 	crb_assert(crb_expression_type_is_valid(type), return NULL);
 
 	struct crb_expression *e = malloc(sizeof(struct crb_expression));
@@ -66,7 +67,8 @@ struct crb_expression *crb_create_expression(int type, void *value)
 		break;
 	case CRB_ASSIGN_EXPRESSION:
 	{
-		printf("unknown\n");
+		struct crb_assign_expression *ae = (struct crb_assign_expression *)value;
+		printf("%s = <%p>\n", ae->variable, ae->exprand);
 		SETV(assign_expression);
 	}
 		break;
@@ -79,9 +81,10 @@ struct crb_expression *crb_create_expression(int type, void *value)
 		break;
 	case CRB_IDENTIFIER_EXPRESSION:
 	{
-		printf("%s\n", V(char *));
+		printf("%s\n", V( const char *));
 		SETV(identifier);
 	}
+		break;
 	default:
 		assert(0);
 		break;
@@ -109,7 +112,7 @@ struct crb_expression *crb_create_binary_expression(int opr,
 	return crb_create_expression(CRB_BINARY_EXPRESSION, &be);
 }
 
-struct crb_expression *crb_create_assign_expression(char *variable,
+struct crb_expression *crb_create_assign_expression(const char *variable,
 		const struct crb_expression *exprand)
 {
 	crb_assert(variable != NULL && exprand != NULL, return NULL);

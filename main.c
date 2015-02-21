@@ -2,9 +2,12 @@
 #include "y.tab.h"
 #include "crb_type.h"
 #include "crb_expression.h"
+#include "crb_interpreter.h"
 
 extern FILE *yyin;
 extern int yyparse();
+
+struct crb_interpreter *itp = NULL;
 
 int main(int argc, char *argv[])
 {
@@ -15,5 +18,10 @@ int main(int argc, char *argv[])
 
 	yyin = fp;
 
-	return yyparse();
+	itp = crb_create_interpreter();
+
+	yyparse();
+	crb_interpreter_exec(itp);
+
+	return 0;
 }

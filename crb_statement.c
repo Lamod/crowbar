@@ -17,7 +17,7 @@ struct crb_statement *crb_create_statement(int type, void *value)
 
 	s->type = type;
 
-	printf("%s t:%s v:%p\n", __func__, type_desc[type], value);
+	printf("%s t:%s(%d) v:%p\n", __func__, type_desc[type], type, value);
 
 #define V(_t_) (*((_t_ *)value))
 #define SETV(_f_) (s->u._f_ = V(typeof(s->u._f_)))

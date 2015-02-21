@@ -5,11 +5,14 @@
 #include "crb_expression.h"
 #include "crb_statement.h"
 #include "crb_eval_exp.h"
+#include "crb_interpreter.h"
+
+extern struct crb_interpreter *itp;
 
 %}
 
 %union {
-	char *identifier;
+	const char *identifier;
 
 	struct crb_expression *expression;
 	struct crb_statement *statement;
@@ -34,7 +37,7 @@ statement
 	:expression SEMICOLON
 	{
 		$$ = crb_create_exp_statement($1);
-		crb_eval_exp(NULL, $1);
+		crb_trunk_append(&(itp->statements), &$$, 1);
 	}
 	;
 expression
@@ -133,6 +136,10 @@ primary_expression
 	| INTEGER_LITERAL
 	| FLOAT_LITERAL
 	| STRING_LITERAL
+	| IDENTIFIER
+	{
+		$$ = crb_create_identifier_expression($1);
+	}
 	| TRUE
 	| FALSE
 	;

@@ -54,7 +54,7 @@ FLOAT (0?|{INTEGER})\.[0-9]+
 
 
 <INITIAL>[_a-zA-Z][_a-zA-Z0-9]* {
-	yylval.identifier = yytext;
+	yylval.identifier = strdup(yytext);
 
 	return IDENTIFIER;
 }
@@ -90,7 +90,6 @@ FLOAT (0?|{INTEGER})\.[0-9]+
 }
 
 <STRING>\" {
-	printf("%s %s \n", __func__, str.data);
 	yylval.expression = crb_create_string_expression(str);
 
 	BEGIN(INITIAL);

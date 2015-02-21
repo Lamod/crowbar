@@ -46,7 +46,7 @@ struct crb_binary_expression {
 };
 
 struct crb_assign_expression {
-	char *variable;
+	const char *variable;
 	const struct crb_expression *exprand;
 };
 
@@ -61,7 +61,7 @@ struct crb_expression {
 		int boolean_value;
 		int int_value;
 		double double_value;
-		char *identifier;
+		const char *identifier;
 		struct crb_string string_value;
 		struct crb_binary_expression binary_expression;
 		struct crb_assign_expression assign_expression;
@@ -106,16 +106,22 @@ extern struct crb_expression *crb_create_expression(int type, void *value);
 	double v = (_v_);\
 	crb_create_expression(CRB_DOUBLE_EXPRESSION, &v);\
 })
+
 #define crb_create_string_expression(_v_) ({\
 	struct crb_string v = (_v_);\
 	crb_create_expression(CRB_STRING_EXPRESSION, &v);\
+})
+
+#define crb_create_identifier_expression(_v_) ({\
+	const char *v = (_v_);\
+	crb_create_expression(CRB_IDENTIFIER_EXPRESSION, &v);\
 })
 
 extern struct crb_expression *crb_create_binary_expression(int opr,
 		const struct crb_expression *left,
 		const struct crb_expression *right);
 
-extern struct crb_expression *crb_create_assign_expression(char *variable,
+extern struct crb_expression *crb_create_assign_expression(const char *variable,
 		const struct crb_expression *exprand);
 
 extern struct crb_expression *crb_create_unary_expression(int opr,

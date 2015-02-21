@@ -152,7 +152,7 @@ static struct crb_value cal_logical_exp(struct crb_interpreter *itp,
 		struct crb_value right,
 		int operator)
 {
-//	crb_assert(exp != NULL && itp != NULL, return CRB_NULL);
+	crb_assert(itp != NULL, return CRB_NULL);
 	crb_assert(operator == CRB_BINARY_OPERATOR_LOGICAL_OR
 			|| operator == CRB_BINARY_OPERATOR_LOGICAL_AND,
 			return CRB_NULL);
@@ -175,12 +175,11 @@ static struct crb_value cal_logical_exp(struct crb_interpreter *itp,
 
 	return v;
 }
-
 	
 static struct crb_value eval_binary_exp(struct crb_interpreter *itp,
 		const struct crb_binary_expression *exp)
 {
-//	crb_assert(exp != NULL && itp != NULL, return CRB_NULL);
+	crb_assert(exp != NULL && itp != NULL, return CRB_NULL);
 	crb_assert(crb_is_valid_binary_operator(exp->binary_operator),
 			return CRB_NULL);
 
@@ -234,7 +233,7 @@ static struct crb_value eval_binary_exp(struct crb_interpreter *itp,
 static struct crb_value eval_unary_exp(struct crb_interpreter *itp,
 		const struct crb_unary_expression *exp)
 {
-//	crb_assert(itp != NULL && exp != NULL, return CRB_NULL);
+	crb_assert(itp != NULL && exp != NULL, return CRB_NULL);
 	crb_assert(crb_is_valid_unary_operator(exp->unary_operator),
 				return CRB_NULL);
 
@@ -265,10 +264,32 @@ static struct crb_value eval_unary_exp(struct crb_interpreter *itp,
 	return v;
 }
 
+static struct crb_value eval_assign_exp(struct crb_interpreter *itp,
+		const struct crb_assign_expression *exp)
+{
+	crb_assert(itp != NULL && exp != NULL, return CRB_NULL);
+
+	struct crb_value v = crb_eval_exp(itp, exp->exprand);
+	
+	int r = crb_interpreter_set_global_variable(itp, exp->variable, v);
+
+	printf("%s %s = (", __func__, exp->variable);
+	crb_value_print(v);
+	printf(")\n");
+
+	return r == 0 ? v : CRB_NULL;
+}
+
+static struct crb_value eval_identifier_exp(struct crb_interpreter *itp,
+		const char *identifier)
+{
+	return crb_interpreter_get_global_variable(itp, identifier);
+}
+
 struct crb_value crb_eval_exp(struct crb_interpreter *itp,
 		const struct crb_expression *exp)
 {
-//	crb_assert(itp != NULL && exp != NULL, return CRB_NULL);
+	crb_assert(itp != NULL && exp != NULL, return CRB_NULL);
 	crb_assert(crb_expression_type_is_valid(exp->type),
 			return CRB_NULL);
 
@@ -296,6 +317,12 @@ struct crb_value crb_eval_exp(struct crb_interpreter *itp,
 		break;
 	case CRB_UNARY_EXPRESSION:
 		v = eval_unary_exp(itp, &exp->u.unary_expression);
+		break;
+	case CRB_ASSIGN_EXPRESSION:
+		v = eval_assign_exp(itp, &exp->u.assign_expression);
+		break;
+	case CRB_IDENTIFIER_EXPRESSION:
+		v = eval_identifier_exp(itp, exp->u.identifier);
 		break;
 	default:
 		break;
