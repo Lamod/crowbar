@@ -35,8 +35,12 @@ extern void crb_value_print(struct crb_value v);
 #define CRB_NULL ((struct crb_value){0})
 
 #define crb_is_null(_v_) ((_v_).type == CRB_NULL_VALUE)
+
 #define crb_is_boolean_value(_v_) ((_v_).type == CRB_BOOLEAN_VALUE)
+
 #define crb_is_numberical_value(_v_) ((_v_).type == CRB_INT_VALUE\
 		|| (_v_).type == CRB_DOUBLE_VALUE)
+
+#define crb_is_string_value(_v_) ((_v_).type == CRB_STRING_VALUE)
 
 #endif //CRB_TYPE_H

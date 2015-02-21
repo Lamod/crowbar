@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-#define cal_binary_numberical_exp(_l_, _r_, _o_) ({\
+#define expand_binary_numberical_exp(_l_, _r_, _o_) ({\
 	struct crb_value _l = (_l_), _r = (_r_), _v = CRB_NULL;\
 	printf("%s (", __func__);\
 	crb_value_print(_l);\
@@ -36,7 +36,7 @@
 	_v;\
 })
 
-#define cal_unary_exp(_v_, _o_) ({\
+#define expand_unary_exp(_v_, _o_) ({\
 	struct crb_value _v = (_v_);\
 	if (_v.type == CRB_DOUBLE_VALUE) {\
 		_v.u.float_value = _o_ _v.u.float_value;\
@@ -63,12 +63,11 @@ static struct crb_value boolean_convert(struct crb_value v)
 	return v;
 }
 
-static struct crb_value cal_comparision_exp(struct crb_interpreter *itp,
+static struct crb_value eval_comparision_exp(struct crb_interpreter *itp,
 		struct crb_value left,
 		struct crb_value right,
 		int operator)
 {
-//	crb_assert(exp != NULL && itp != NULL, return CRB_NULL);
 	crb_assert(crb_is_comparison_operator(operator), return CRB_NULL);
 	if (!crb_is_numberical_value(left)) {
 		//TODO:runtime error
@@ -83,54 +82,40 @@ static struct crb_value cal_comparision_exp(struct crb_interpreter *itp,
 
 	switch(operator) {
 	case CRB_BINARY_OPERATOR_GT:
-		v = cal_binary_numberical_exp(left, right, >);
+		v = expand_binary_numberical_exp(left, right, >);
 		break;
 	case CRB_BINARY_OPERATOR_GE:
-		v = cal_binary_numberical_exp(left, right, >=);
+		v = expand_binary_numberical_exp(left, right, >=);
 		break;
 	case CRB_BINARY_OPERATOR_LE:
-		v = cal_binary_numberical_exp(left, right, <);
+		v = expand_binary_numberical_exp(left, right, <=);
 		break;
 	case CRB_BINARY_OPERATOR_LT:
-		v = cal_binary_numberical_exp(left, right, <=);
+		v = expand_binary_numberical_exp(left, right, <);
 		break;
 	}
 
 	return boolean_convert(v);
 }
 
-static struct crb_value cal_equality_exp(struct crb_interpreter *itp,
+static struct crb_value eval_equality_exp(struct crb_interpreter *itp,
 		struct crb_value left,
 		struct crb_value right,
 		int operator)
 {
-//	crb_assert(exp != NULL && itp != NULL, return CRB_NULL);
 	crb_assert(crb_is_equality_operator(operator), return CRB_NULL);
-
-	if (!(crb_is_numberical_value(left) || crb_is_boolean_value(left))) {
-		assert(0);
-	}
-	if (!(crb_is_numberical_value(right) || crb_is_boolean_value(right))) {
-		assert(0);
-	}
-
-	if (crb_is_numberical_value(left) && crb_is_boolean_value(right)) {
-		assert(0);
-	} else if (crb_is_numberical_value(left) && crb_is_boolean_value(right)) {
-		assert(0);
-	}
 
 	struct crb_value v = CRB_NULL;
 
 	if (crb_is_numberical_value(left) && crb_is_numberical_value(right)) {
 		if (operator == CRB_BINARY_OPERATOR_EQ) {
-			v = cal_binary_numberical_exp(left, right, ==);
+			v = expand_binary_numberical_exp(left, right, ==);
 		} else {
-			v = cal_binary_numberical_exp(left, right, !=);
+			v = expand_binary_numberical_exp(left, right, !=);
 		}
 
 		v = boolean_convert(v);
-	} else { // both boolean exp
+	} else if (crb_is_boolean_value(left) && crb_is_boolean_value(right)) { // both boolean exp
 		v.type = CRB_BOOLEAN_VALUE;
 		if (operator == CRB_BINARY_OPERATOR_EQ) {
 			v.u.boolean_value =
@@ -139,6 +124,8 @@ static struct crb_value cal_equality_exp(struct crb_interpreter *itp,
 			v.u.boolean_value =
 				left.u.boolean_value != right.u.boolean_value;
 		}
+	} else {
+		assert(0);
 	}
 
 	printf("%s ", __func__);
@@ -147,12 +134,11 @@ static struct crb_value cal_equality_exp(struct crb_interpreter *itp,
 	return v;
 }
 
-static struct crb_value cal_logical_exp(struct crb_interpreter *itp,
+static struct crb_value eval_logical_exp(struct crb_interpreter *itp,
 		struct crb_value left,
 		struct crb_value right,
 		int operator)
 {
-	crb_assert(itp != NULL, return CRB_NULL);
 	crb_assert(operator == CRB_BINARY_OPERATOR_LOGICAL_OR
 			|| operator == CRB_BINARY_OPERATOR_LOGICAL_AND,
 			return CRB_NULL);
@@ -175,11 +161,48 @@ static struct crb_value cal_logical_exp(struct crb_interpreter *itp,
 
 	return v;
 }
+
+static struct crb_value eval_numberical_exp(struct crb_interpreter *itp,
+		struct crb_value left,
+		struct crb_value right,
+		int operator)
+{
+	if (!crb_is_numberical_value(left) || !crb_is_numberical_value(right)) {
+		assert(0);
+	}
+
+	struct crb_value v = CRB_NULL;
+
+	switch (operator) {
+	case CRB_BINARY_OPERATOR_ADD:
+		v = expand_binary_numberical_exp(left, right, +);
+		break;
+	case CRB_BINARY_OPERATOR_SUB:
+		v = expand_binary_numberical_exp(left, right, -);
+		break;
+	case CRB_BINARY_OPERATOR_MUL:
+		v = expand_binary_numberical_exp(left, right, *);
+		break;
+	case CRB_BINARY_OPERATOR_DIV:
+		v = expand_binary_numberical_exp(left, right, /);
+		break;
+	case CRB_BINARY_OPERATOR_MOD:
+		if (right.type != CRB_INT_VALUE || left.type != CRB_INT_VALUE) {
+			//TODO:runtime error
+			assert(0);
+		}
+
+		v.type = CRB_INT_VALUE;
+		v.u.int_value = left.u.int_value % right.u.int_value;
+		break;
+	}
+
+	return v;
+}
 	
 static struct crb_value eval_binary_exp(struct crb_interpreter *itp,
 		const struct crb_binary_expression *exp)
 {
-	crb_assert(exp != NULL && itp != NULL, return CRB_NULL);
 	crb_assert(crb_is_valid_binary_operator(exp->binary_operator),
 			return CRB_NULL);
 
@@ -189,39 +212,25 @@ static struct crb_value eval_binary_exp(struct crb_interpreter *itp,
 
 	switch (exp->binary_operator) {
 	case CRB_BINARY_OPERATOR_ADD:
-		v = cal_binary_numberical_exp(l, r, +);
-		break;
 	case CRB_BINARY_OPERATOR_SUB:
-		v = cal_binary_numberical_exp(l, r, -);
-		break;
 	case CRB_BINARY_OPERATOR_MUL:
-		v = cal_binary_numberical_exp(l, r, *);
-		break;
 	case CRB_BINARY_OPERATOR_DIV:
-		v = cal_binary_numberical_exp(l, r, /);
-		break;
 	case CRB_BINARY_OPERATOR_MOD:
-		if (r.type != CRB_INT_VALUE || l.type != CRB_INT_VALUE) {
-			//TODO:runtime error
-			assert(0);
-		}
-
-		v.type = CRB_INT_VALUE;
-		v.u.int_value = l.u.int_value % r.u.int_value;
+		v = eval_numberical_exp(itp, l, r, exp->binary_operator);
 		break;
 	case CRB_BINARY_OPERATOR_GT:
 	case CRB_BINARY_OPERATOR_GE:
 	case CRB_BINARY_OPERATOR_LE:
 	case CRB_BINARY_OPERATOR_LT:
-		v = cal_comparision_exp(itp, l, r, exp->binary_operator);
+		v = eval_comparision_exp(itp, l, r, exp->binary_operator);
 		break;
 	case CRB_BINARY_OPERATOR_NE:
 	case CRB_BINARY_OPERATOR_EQ:
-		v = cal_equality_exp(itp, l, r, exp->binary_operator);
+		v = eval_equality_exp(itp, l, r, exp->binary_operator);
 		break;
 	case CRB_BINARY_OPERATOR_LOGICAL_OR:
 	case CRB_BINARY_OPERATOR_LOGICAL_AND:
-		v = cal_logical_exp(itp, l, r, exp->binary_operator);
+		v = eval_logical_exp(itp, l, r, exp->binary_operator);
 		break;
 	default:
 		break;
@@ -233,7 +242,6 @@ static struct crb_value eval_binary_exp(struct crb_interpreter *itp,
 static struct crb_value eval_unary_exp(struct crb_interpreter *itp,
 		const struct crb_unary_expression *exp)
 {
-	crb_assert(itp != NULL && exp != NULL, return CRB_NULL);
 	crb_assert(crb_is_valid_unary_operator(exp->unary_operator),
 				return CRB_NULL);
 
@@ -248,10 +256,13 @@ static struct crb_value eval_unary_exp(struct crb_interpreter *itp,
 		if (!crb_is_boolean_value(v)) {
 			assert(0);
 		}
-		v = cal_unary_exp(v, !);
+		v = expand_unary_exp(v, !);
 		break;
 	case CRB_UNARY_OPERATOR_MINUS:
-		v = cal_unary_exp(v, -);
+		if (!crb_is_numberical_value(v)) {
+			assert(0);
+		}
+		v = expand_unary_exp(v, -);
 		break;
 	default:
 		break;
@@ -267,8 +278,6 @@ static struct crb_value eval_unary_exp(struct crb_interpreter *itp,
 static struct crb_value eval_assign_exp(struct crb_interpreter *itp,
 		const struct crb_assign_expression *exp)
 {
-	crb_assert(itp != NULL && exp != NULL, return CRB_NULL);
-
 	struct crb_value v = crb_eval_exp(itp, exp->exprand);
 	
 	int r = crb_interpreter_set_global_variable(itp, exp->variable, v);
@@ -283,7 +292,12 @@ static struct crb_value eval_assign_exp(struct crb_interpreter *itp,
 static struct crb_value eval_identifier_exp(struct crb_interpreter *itp,
 		const char *identifier)
 {
-	return crb_interpreter_get_global_variable(itp, identifier);
+	struct crb_value v = crb_interpreter_get_global_variable(itp, identifier);
+	if (crb_is_null(v)) {
+		assert(0);
+	}
+
+	return v;
 }
 
 struct crb_value crb_eval_exp(struct crb_interpreter *itp,
