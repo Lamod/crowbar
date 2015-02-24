@@ -4,7 +4,7 @@
 
 static char *exp_type_desc[] = {
 	"NONE", "BOOL", "INT", "DOUBLE", "STRING", "FUNCTION",
-	"IDENTIFIER", "BINARY", "ASSIGN", "UNARY",
+	"IDENTIFIER", "FUNCTION_CALL", "BINARY", "ASSIGN", "UNARY",
 };
 
 static char *binary_operator_desc[] = {
@@ -91,6 +91,12 @@ struct crb_expression *crb_create_expression(int type, void *value)
 		SETV(function_value);
 	}
 		break;
+	case CRB_FUNCTION_CALL_EXPRESSION:
+	{
+		printf("%s()\n", ((struct crb_function_call_expression *)value)->function_name);
+		SETV(function_call_expression);
+	}
+		break;
 	default:
 		assert(0);
 		break;
@@ -100,6 +106,20 @@ struct crb_expression *crb_create_expression(int type, void *value)
 #undef SETV
 
 	return e;
+}
+
+struct crb_expression *crb_create_function_call_expression(
+		const char *function,
+		const struct crb_trunk *arguments)
+{
+	crb_assert(function != NULL, return NULL);
+
+	struct crb_function_call_expression fe = {
+		.function_name = function,
+		.arguments = arguments ? *arguments : (struct crb_trunk){0}
+	};
+
+	return crb_create_expression(CRB_FUNCTION_CALL_EXPRESSION, &fe);
 }
 
 struct crb_expression *crb_create_binary_expression(int opr,

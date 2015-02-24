@@ -11,6 +11,7 @@ enum {
 	CRB_STRING_EXPRESSION,
 	CRB_FUNCTION_EXPRESSION,
 	CRB_IDENTIFIER_EXPRESSION,
+	CRB_FUNCTION_CALL_EXPRESSION,
 	CRB_BINARY_EXPRESSION,
 	CRB_ASSIGN_EXPRESSION,
 	CRB_UNARY_EXPRESSION,
@@ -41,8 +42,13 @@ enum {
 
 struct crb_expression;
 
+struct crb_function_call_expression {
+	const char *function_name;
+	const struct crb_trunk arguments;
+};
+
 struct crb_binary_expression {
-	int binary_operator;
+	const int binary_operator;
 	const struct crb_expression *left, *right;
 };
 
@@ -52,7 +58,7 @@ struct crb_assign_expression {
 };
 
 struct crb_unary_expression {
-	int unary_operator;
+	const int unary_operator;
 	const struct crb_expression *expression;
 };
 
@@ -65,6 +71,7 @@ struct crb_expression {
 		struct crb_string string_value;
 		struct crb_function function_value;
 		const char *identifier;
+		struct crb_function_call_expression function_call_expression;
 		struct crb_binary_expression binary_expression;
 		struct crb_assign_expression assign_expression;
 		struct crb_unary_expression unary_expression;
@@ -123,6 +130,10 @@ extern struct crb_expression *crb_create_expression(int type, void *value);
 	struct crb_function _v = (_v_);\
 	crb_create_expression(CRB_FUNCTION_EXPRESSION, &_v);\
 })
+
+extern struct crb_expression *crb_create_function_call_expression(
+		const char *function,
+		const struct crb_trunk *arguments);
 
 extern struct crb_expression *crb_create_binary_expression(int opr,
 		const struct crb_expression *left,

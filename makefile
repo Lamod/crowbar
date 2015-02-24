@@ -15,7 +15,8 @@ INCLUDES=\
 	 crb_type.h \
 	 crb_statement.h \
 	 crb_interpreter.h \
-	 util/crb_trunk.h
+	 util/crb_trunk.h \
+	 util/crb_util.h
 
 $(TARGET):$(OBJS)
 	$(CC) $(OBJS) -o $(TARGET)

@@ -20,6 +20,7 @@ extern struct crb_interpreter *itp;
 
 	struct crb_trunk parameters;
 	struct crb_trunk statements;
+	struct crb_trunk arguments;
 }
 
 %token 	<expression> INTEGER_LITERAL FLOAT_LITERAL STRING_LITERAL
@@ -35,6 +36,7 @@ extern struct crb_interpreter *itp;
 %type	<statement> statement return_statement
 %type	<statements> statement_list block
 %type	<parameters> parameter_list
+%type	<arguments> argument_list
 
 %%
 
@@ -47,11 +49,8 @@ global_statement_list
 statement_list
 	:statement
 	{
-		struct crb_trunk t = {0};
-		crb_trunk_init(&t, sizeof($1), 1);
-		crb_trunk_append(&t, &$1, 1);
-
-		$$ = t;
+		crb_trunk_init(&$$, sizeof($1), 1);
+		crb_trunk_append(&$$, &$1, 1);
 	}
 	|statement_list statement
 	{ 
@@ -175,7 +174,27 @@ primary_expression
 	}
 	| TRUE
 	| FALSE
+	| IDENTIFIER LP argument_list RP
+	{
+		$$ = crb_create_function_call_expression($1, &$3);
+	}
+	| IDENTIFIER LP RP
+	{
+		$$ = crb_create_function_call_expression($1, NULL);
+	}
 	| function_defination
+	;
+argument_list
+	:expression
+	{
+		crb_trunk_init(&$$, sizeof($1), 1);
+		crb_trunk_append(&$$, &$1, 1);
+	}
+	|argument_list COMMA expression
+	{
+		crb_trunk_append(&$1, &$3, 1);
+		$$ = $1;
+	}
 	;
 function_defination
 	:FUNCTION LP parameter_list RP block
@@ -187,11 +206,8 @@ function_defination
 parameter_list
 	:IDENTIFIER
 	{
-		struct crb_trunk t = {0};
-		crb_trunk_init(&t, sizeof($1), 1);
-		crb_trunk_append(&t, &$1, 1);
-
-		$$ = t;
+		crb_trunk_init(&$$, sizeof($1), 1);
+		crb_trunk_append(&$$, &$1, 1);
 	}
 	|parameter_list COMMA IDENTIFIER
 	{
