@@ -280,7 +280,7 @@ static struct crb_value eval_assign_exp(struct crb_interpreter *itp,
 {
 	struct crb_value v = crb_eval_exp(itp, exp->exprand);
 	
-	int r = crb_interpreter_set_global_variable(itp, exp->variable, v);
+	int r = crb_scope_set_variable(itp->top_scope, exp->variable, v);
 
 	printf("%s %s = (", __func__, exp->variable);
 	crb_value_print(v);
@@ -292,7 +292,7 @@ static struct crb_value eval_assign_exp(struct crb_interpreter *itp,
 static struct crb_value eval_identifier_exp(struct crb_interpreter *itp,
 		const char *identifier)
 {
-	struct crb_value v = crb_interpreter_get_global_variable(itp, identifier);
+	struct crb_value v = crb_scope_get_variable(itp->top_scope, identifier, 1);
 
 	printf("%s %s = (", __func__, identifier);
 	crb_value_print(v);
@@ -305,9 +305,49 @@ static struct crb_value eval_identifier_exp(struct crb_interpreter *itp,
 	return v;
 }
 
+static struct crb_value eval_function_call_exp(
+		struct crb_interpreter *itp,
+		const struct crb_function_call_expression *fe)
+{
+	struct crb_value func_value = crb_scope_get_variable(
+			itp->top_scope,
+			fe->function_name, 1);
+	if (!crb_is_function_value(func_value)) {
+		assert(0);
+	}
+
+	struct crb_function *func = &(func_value.u.function_value);
+	crb_assert(func->parameters.count == fe->arguments.count,
+			return CRB_NULL);
+
+	struct crb_scope *scope = crb_interpreter_push_scope(itp);
+
+	const char *name = NULL;
+	const struct crb_expression *exp = NULL;
+
+	for (int i = 0; i < func->parameters.count; ++i) {
+		crb_trunk_read_element(&func->parameters, &name, i);
+		crb_trunk_read_element(&fe->arguments, &exp, i);
+
+		crb_scope_set_variable(scope, name, crb_eval_exp(itp, exp));
+	}
+
+	struct crb_value r = crb_interpreter_exec_statements(itp,
+			&func->statements);
+
+	if (scope != crb_interpreter_pop_scope(itp)) {
+		crb_panic(return CRB_NULL);
+	}
+	
+	free(scope);
+
+	return r;
+}
+
 struct crb_value crb_eval_exp(struct crb_interpreter *itp,
 		const struct crb_expression *exp)
 {
+	printf("%s %p %p %d\n", __func__, itp, exp, exp->type);
 	crb_assert(itp != NULL && exp != NULL, return CRB_NULL);
 	crb_assert(crb_expression_type_is_valid(exp->type),
 			return CRB_NULL);
@@ -346,6 +386,9 @@ struct crb_value crb_eval_exp(struct crb_interpreter *itp,
 		break;
 	case CRB_IDENTIFIER_EXPRESSION:
 		v = eval_identifier_exp(itp, exp->u.identifier);
+		break;
+	case CRB_FUNCTION_CALL_EXPRESSION:
+		v = eval_function_call_exp(itp, &exp->u.function_call_expression);
 		break;
 	default:
 		break;

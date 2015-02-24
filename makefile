@@ -19,7 +19,7 @@ INCLUDES=\
 	 util/crb_util.h
 
 $(TARGET):$(OBJS)
-	$(CC) $(OBJS) -o $(TARGET)
+	$(CC) $(OBJS) -g -o $(TARGET)
 clean:
 	rm util/*.o *.o lex.yy.c y.tab.h y.tab.c y.output crowbar
 

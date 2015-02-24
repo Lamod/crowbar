@@ -1,4 +1,13 @@
-foo = function (a, b) {
+add = function(a, b) {
 	return a + b;
 };
-foo(2, 3);
+
+add(2, -1);
+
+binary = function(f, a, b) {
+	return f(a, b);
+};
+
+binary(add, 2, -1);
+
+binary(function(a, b) { return a - b; }, 2, -1);

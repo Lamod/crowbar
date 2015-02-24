@@ -11,6 +11,8 @@
 #define MAX(a, b) (a > b ? a : b)
 #endif // MAX
 
+#define crb_do_nothing ((void)0)
+
 //#ifdef CRB_DEBUG
 
 #define crb_assert(_cond_, _handler_) do {\

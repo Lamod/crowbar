@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 	printf("parsing finished, start executing\n");
 	printf("----------------------------\n");
 
-	crb_interpreter_exec(itp);
+	crb_interpreter_run(itp);
 
 	return 0;
 }

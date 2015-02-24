@@ -1,6 +1,7 @@
 #include "crb_trunk.h"
 #include "crb_util.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #define CRB_TRUNK(_t_) ((struct crb_trunk *)(_t_))
@@ -31,6 +32,8 @@ unsigned int crb_trunk_append(void *trunk, void *elements, unsigned int count)
 
 	struct crb_trunk *t = CRB_TRUNK(trunk);
 
+	crb_assert(t->e_size != 0, return -1);
+
 	unsigned int new_count = t->count + count;
 	if (t->capacity < new_count) {
 		unsigned int new_cap = 2 * (new_count);
@@ -51,6 +54,8 @@ int crb_trunk_copy(void *dest, void *src, int count)
 	crb_assert(dest != NULL && src != NULL, return -1);
 
 	struct crb_trunk *s = CRB_TRUNK(src), *d = CRB_TRUNK(dest);
+
+	crb_assert(s->e_size != 0 && d->e_size != 0, return -1);
 
 	unsigned int c = MIN(count, s->count);
 	if (c == 0) {
