@@ -44,6 +44,7 @@ FLOAT (0?|{INTEGER})\.[0-9]+
 <INITIAL>";"		return SEMICOLON;
 <INITIAL>","		return COMMA;
 <INITIAL>"function"	return FUNCTION;
+<INITIAL>"return"	return RETURN;
 <INITIAL>"true" {
 	yylval.expression = crb_create_boolean_expression(1);
 

@@ -66,13 +66,10 @@ static struct crb_value exec_statement(struct crb_interpreter *itp,
 
 	switch (statement->type) {
 	case CRB_EXP_STATEMENT:
-	{
 		return crb_eval_exp(itp,
 				statement->u.exp_statement.expression);
-	}
-	break;
 	default:
-	break;
+		break;
 	}
 
 	return CRB_NULL;

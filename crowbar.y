@@ -25,12 +25,14 @@ extern struct crb_interpreter *itp;
 %token 	<expression> INTEGER_LITERAL FLOAT_LITERAL STRING_LITERAL
 %token 	<identifier> IDENTIFIER
 %token 	<expression> TRUE FALSE
-%token 	ADD SUB MUL DIV MOD LP RP LC RC GT GE LT LE EQ NE LOGICAL_AND LOGICAL_OR INVERT ASSIGN SEMICOLON COMMA FUNCTION
+%token 	ADD SUB MUL DIV MOD LP RP LC RC GT GE LT LE EQ NE
+	LOGICAL_AND LOGICAL_OR INVERT ASSIGN SEMICOLON COMMA
+	FUNCTION RETURN
 %type 	<expression> expression logical_or_expression logical_and_expression
 	equality_expression relational_expression additive_expression
 	multiplicative_expression unary_expression primary_expression
 	function_defination
-%type	<statement> statement
+%type	<statement> statement return_statement
 %type	<statements> statement_list block
 %type	<parameters> parameter_list
 
@@ -62,6 +64,13 @@ statement
 	:expression SEMICOLON
 	{
 		$$ = crb_create_exp_statement($1);
+	}
+	| return_statement
+	;
+return_statement
+	: RETURN expression SEMICOLON
+	{
+		$$ = crb_create_return_statement($2);
 	}
 	;
 expression

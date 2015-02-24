@@ -3,12 +3,12 @@
 #include "crb_statement.h"
 
 static char *type_desc[] = {
-	"NONE", "EXP"
+	"NONE", "EXP", "RETURN"
 };
 
 struct crb_statement *crb_create_statement(int type, void *value)
 {
-	crb_assert(type <= CRB_EXP_STATEMENT, return NULL);
+	crb_assert(type <= CRB_RETURN_STATEMENT, return NULL);
 
 	struct crb_statement *s = malloc(sizeof(struct crb_statement));
 	if (s == NULL) {
@@ -24,9 +24,10 @@ struct crb_statement *crb_create_statement(int type, void *value)
 
 	switch(type) {
 	case CRB_EXP_STATEMENT:
-	{
 		SETV(exp_statement);
-	}
+		break;
+	case CRB_RETURN_STATEMENT:
+		SETV(return_statement);
 		break;
 	default:
 		assert(0);
