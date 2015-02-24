@@ -25,6 +25,11 @@ size_t crb_string_append_chars(struct crb_string *str, char *chars)
 	return r;
 }
 
+struct crb_function *crb_create_function(void)
+{
+	return calloc(sizeof(struct crb_function), 1);
+}
+
 void crb_value_print(struct crb_value v)
 {
 	switch(v.type) {
@@ -42,6 +47,9 @@ void crb_value_print(struct crb_value v)
 		break;
 	case CRB_STRING_VALUE:
 		printf("string: %s", v.u.string_value.data);
+		break;
+	case CRB_FUNCTION_VALUE:
+		printf("function");
 		break;
 	default:
 		printf("unknown type: %d", v.type);

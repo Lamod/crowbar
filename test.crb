@@ -1,4 +1,4 @@
-s = 3;
-i = s + 1;
-b = true + 1;
-s = "asdfghjklrtyuiop";
+i = 1 * 2 + 3 / 2;
+foo = function (a, b) {
+	a + b;
+};

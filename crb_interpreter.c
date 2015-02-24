@@ -12,7 +12,6 @@ struct crb_interpreter *crb_create_interpreter(void)
 	}
 
 	crb_trunk_init(&itp->global_variables, sizeof(struct crb_variable), 50);
-	crb_trunk_init(&itp->statements, sizeof(struct crb_statement *), 50);
 
 	return itp;
 }
@@ -62,6 +61,9 @@ struct crb_value crb_interpreter_get_global_variable(struct crb_interpreter *itp
 static struct crb_value exec_statement(struct crb_interpreter *itp,
 		struct crb_statement *statement)
 {
+	printf("%s statement: %p exp: %p\n", __func__,
+			statement, statement->u.exp_statement.expression);
+
 	switch (statement->type) {
 	case CRB_EXP_STATEMENT:
 	{

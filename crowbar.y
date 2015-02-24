@@ -6,6 +6,7 @@
 #include "crb_statement.h"
 #include "crb_eval_exp.h"
 #include "crb_interpreter.h"
+#include "util/crb_trunk.h"
 
 extern struct crb_interpreter *itp;
 
@@ -16,28 +17,51 @@ extern struct crb_interpreter *itp;
 
 	struct crb_expression *expression;
 	struct crb_statement *statement;
+
+	struct crb_trunk parameters;
+	struct crb_trunk statements;
 }
 
 %token 	<expression> INTEGER_LITERAL FLOAT_LITERAL STRING_LITERAL
 %token 	<identifier> IDENTIFIER
 %token 	<expression> TRUE FALSE
-%token 	ADD SUB MUL DIV MOD LP RP GT GE LT LE EQ NE LOGICAL_AND LOGICAL_OR INVERT ASSIGN SEMICOLON
+%token 	ADD SUB MUL DIV MOD LP RP LC RC GT GE LT LE EQ NE LOGICAL_AND LOGICAL_OR INVERT ASSIGN SEMICOLON COMMA FUNCTION
 %type 	<expression> expression logical_or_expression logical_and_expression
 	equality_expression relational_expression additive_expression
 	multiplicative_expression unary_expression primary_expression
+	function_defination
 %type	<statement> statement
+%type	<statements> statement_list block
+%type	<parameters> parameter_list
 
 %%
 
+global_statement_list
+	:statement_list
+	{
+		itp->statements = $1;
+	}
+	;
 statement_list
 	:statement
+	{
+		struct crb_trunk t = {0};
+		crb_trunk_init(&t, sizeof($1), 1);
+		crb_trunk_append(&t, &$1, 1);
+
+		$$ = t;
+	}
 	|statement_list statement
+	{ 
+		crb_trunk_append(&$1, &$2, 1);
+		
+		$$ = $1;
+	}
 	;
 statement
 	:expression SEMICOLON
 	{
 		$$ = crb_create_exp_statement($1);
-		crb_trunk_append(&(itp->statements), &$$, 1);
 	}
 	;
 expression
@@ -142,6 +166,36 @@ primary_expression
 	}
 	| TRUE
 	| FALSE
+	| function_defination
+	;
+function_defination
+	:FUNCTION LP parameter_list RP block
+	{
+		struct crb_function f = { .parameters = $3, .statements = $5 };
+		$$ = crb_create_function_expression(f);
+	}
+	;
+parameter_list
+	:IDENTIFIER
+	{
+		struct crb_trunk t = {0};
+		crb_trunk_init(&t, sizeof($1), 1);
+		crb_trunk_append(&t, &$1, 1);
+
+		$$ = t;
+	}
+	|parameter_list COMMA IDENTIFIER
+	{
+		crb_trunk_append(&$1, &$3, 1);
+
+		$$ = $1;
+	}
+	;
+block
+	: LC statement_list RC
+	{
+		$$ = $2;
+	}
 	;
 %%
 

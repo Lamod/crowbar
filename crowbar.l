@@ -24,6 +24,8 @@ FLOAT (0?|{INTEGER})\.[0-9]+
 
 <INITIAL>"("            return LP;
 <INITIAL>")"            return RP;
+<INITIAL>"{"            return LC;
+<INITIAL>"}"            return RC;
 <INITIAL>"&&"           return LOGICAL_AND;
 <INITIAL>"||"           return LOGICAL_OR;
 <INITIAL>"="            return ASSIGN;
@@ -40,6 +42,8 @@ FLOAT (0?|{INTEGER})\.[0-9]+
 <INITIAL>"/"            return DIV;
 <INITIAL>"%"            return MOD;
 <INITIAL>";"		return SEMICOLON;
+<INITIAL>","		return COMMA;
+<INITIAL>"function"	return FUNCTION;
 <INITIAL>"true" {
 	yylval.expression = crb_create_boolean_expression(1);
 
@@ -51,7 +55,6 @@ FLOAT (0?|{INTEGER})\.[0-9]+
 
 	return FALSE;
 }
-
 
 <INITIAL>[_a-zA-Z][_a-zA-Z0-9]* {
 	yylval.identifier = strdup(yytext);

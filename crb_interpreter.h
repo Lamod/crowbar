@@ -5,17 +5,13 @@
 #include "crb_type.h"
 #include "crb_statement.h"
 
-struct crb_list {
-	CRB_TRUNK_HEADER;
-};
-
 struct crb_variable {
 	const char *identifier;
 	struct crb_value value;
 };
 
 struct crb_interpreter {
-	struct crb_list global_variables, statements;
+	struct crb_trunk global_variables, statements;
 };
 
 extern struct crb_interpreter *crb_create_interpreter(void);

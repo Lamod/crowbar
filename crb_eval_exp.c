@@ -293,6 +293,11 @@ static struct crb_value eval_identifier_exp(struct crb_interpreter *itp,
 		const char *identifier)
 {
 	struct crb_value v = crb_interpreter_get_global_variable(itp, identifier);
+
+	printf("%s %s = (", __func__, identifier);
+	crb_value_print(v);
+	printf(")\n");
+	
 	if (crb_is_null(v)) {
 		assert(0);
 	}
@@ -323,8 +328,12 @@ struct crb_value crb_eval_exp(struct crb_interpreter *itp,
 		v.u.float_value = exp->u.double_value;
 		break;
 	case CRB_STRING_EXPRESSION:
-		v.type = CRB_STRING_EXPRESSION;
+		v.type = CRB_STRING_VALUE;
 		v.u.string_value = exp->u.string_value;
+		break;
+	case CRB_FUNCTION_EXPRESSION:
+		v.type = CRB_FUNCTION_VALUE;
+		v.u.function_value = exp->u.function_value;
 		break;
 	case CRB_BINARY_EXPRESSION:
 		v = eval_binary_exp(itp, &exp->u.binary_expression);

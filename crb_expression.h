@@ -9,6 +9,7 @@ enum {
 	CRB_INT_EXPRESSION,
 	CRB_DOUBLE_EXPRESSION,
 	CRB_STRING_EXPRESSION,
+	CRB_FUNCTION_EXPRESSION,
 	CRB_IDENTIFIER_EXPRESSION,
 	CRB_BINARY_EXPRESSION,
 	CRB_ASSIGN_EXPRESSION,
@@ -61,8 +62,9 @@ struct crb_expression {
 		int boolean_value;
 		int int_value;
 		double double_value;
-		const char *identifier;
 		struct crb_string string_value;
+		struct crb_function function_value;
+		const char *identifier;
 		struct crb_binary_expression binary_expression;
 		struct crb_assign_expression assign_expression;
 		struct crb_unary_expression unary_expression;
@@ -115,6 +117,11 @@ extern struct crb_expression *crb_create_expression(int type, void *value);
 #define crb_create_identifier_expression(_v_) ({\
 	const char *v = (_v_);\
 	crb_create_expression(CRB_IDENTIFIER_EXPRESSION, &v);\
+})
+
+#define crb_create_function_expression(_v_) ({\
+	struct crb_function _v = (_v_);\
+	crb_create_expression(CRB_FUNCTION_EXPRESSION, &_v);\
 })
 
 extern struct crb_expression *crb_create_binary_expression(int opr,

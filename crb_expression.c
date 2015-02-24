@@ -3,7 +3,7 @@
 #include "util/crb_util.h"
 
 static char *exp_type_desc[] = {
-	"NONE", "BOOL", "INT", "DOUBLE", "STRING",
+	"NONE", "BOOL", "INT", "DOUBLE", "STRING", "FUNCTION",
 	"IDENTIFIER", "BINARY", "ASSIGN", "UNARY",
 };
 
@@ -81,8 +81,14 @@ struct crb_expression *crb_create_expression(int type, void *value)
 		break;
 	case CRB_IDENTIFIER_EXPRESSION:
 	{
-		printf("%s\n", V( const char *));
+		printf("%s\n", V(const char *));
 		SETV(identifier);
+	}
+		break;
+	case CRB_FUNCTION_EXPRESSION:
+	{
+		printf("\n");
+		SETV(function_value);
 	}
 		break;
 	default:

@@ -3,16 +3,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct _crb_trunk {
-	CRB_TRUNK_HEADER;
-};
+#define CRB_TRUNK(_t_) ((struct crb_trunk *)(_t_))
 
 int crb_trunk_init(void *trunk, size_t e_size, unsigned int capacity)
 {
 	crb_assert(trunk != NULL, return 1);
 	crb_assert(e_size != 0 && capacity != 0, return 1);
 
-	struct _crb_trunk *t = (struct _crb_trunk *)trunk;
+	struct crb_trunk *t = CRB_TRUNK(trunk);
 
 	t->data = calloc(e_size, capacity);
 	if (t->data == NULL) {
@@ -31,12 +29,12 @@ unsigned int crb_trunk_append(void *trunk, void *elements, unsigned int count)
 	crb_assert(trunk != NULL, return 0);
 	crb_assert(elements != NULL && count > 0, return 0);
 
-	struct _crb_trunk *t = (struct _crb_trunk *)trunk;
+	struct crb_trunk *t = CRB_TRUNK(trunk);
 
 	unsigned int new_count = t->count + count;
 	if (t->capacity < new_count) {
 		unsigned int new_cap = 2 * (new_count);
-		t->data = realloc(t->data, new_cap);
+		t->data = realloc(t->data, new_cap * t->e_size);
 		t->capacity = new_cap;
 
 		memset(t->data + new_count * t->e_size, 0, (t->capacity - new_count) * t->e_size);
@@ -46,5 +44,33 @@ unsigned int crb_trunk_append(void *trunk, void *elements, unsigned int count)
 	t->count = new_count;
 
 	return count;
+}
+
+int crb_trunk_copy(void *dest, void *src, int count)
+{
+	crb_assert(dest != NULL && src != NULL, return -1);
+
+	struct crb_trunk *s = CRB_TRUNK(src), *d = CRB_TRUNK(dest);
+
+	unsigned int c = MIN(count, s->count);
+	if (c == 0) {
+		return 0;
+	}
+
+	if (crb_trunk_init(d, s->e_size, c) == -1) {
+		return -1;
+	}
+
+	memcpy(d->data, s->data, c * s->e_size);
+	d->count = c;
+
+	return c;
+}
+
+int crb_trunk_min_copy(void *dest, void *src)
+{
+	crb_assert(dest != NULL && src != NULL, return -1);
+
+	return crb_trunk_copy(dest, src, CRB_TRUNK(src)->count);
 }
 
