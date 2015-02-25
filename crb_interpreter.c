@@ -14,7 +14,7 @@ int crb_scope_set_variable(struct crb_scope *scope,
 	printf("\n");
 
 	struct crb_variable *pvar = NULL;
-	for (int i = 0; i < scope->variables.count; ++i) {
+	for (int i = scope->variables.count - 1; i >= 0; --i) {
 		pvar = (struct crb_variable *)scope->variables.data + i;
 		if (strcmp(variable, pvar->identifier) != 0) {
 			continue;
@@ -39,7 +39,7 @@ struct crb_value crb_scope_get_variable(struct crb_scope *scope,
 	crb_assert(scope != NULL && variable != NULL, return CRB_NULL);
 
 	struct crb_variable *pvar = NULL;
-	for (int i = 0; i < scope->variables.count; ++i) {
+	for (int i = scope->variables.count - 1; i >= 0; --i) {
 		pvar = (struct crb_variable *)scope->variables.data + i;
 
 		if (strcmp(variable, pvar->identifier) != 0) {
