@@ -8,7 +8,7 @@ OBJS=\
      crb_eval_exp.o \
      crb_exec.o \
      crb_interpreter.o \
-     y.tab.o \
+     crowbar.tab.o \
      lex.yy.o \
      main.o
 INCLUDES=\
@@ -24,17 +24,15 @@ INCLUDES=\
 $(TARGET):$(OBJS)
 	$(CC) $(OBJS) -g -o $(TARGET)
 clean:
-	rm util/*.o *.o lex.yy.c y.tab.h y.tab.c y.output crowbar
+	rm util/*.o *.o lex.yy.c crowbar.tab.h crowbar.tab.c crowbar.output crowbar
 
-lex.yy.c: crowbar.l
+lex.yy.o: crowbar.l
 	flex crowbar.l
-y.tab.h: crowbar.y
-	bison --yacc -dv crowbar.y
-y.tab.c: crowbar.y
-	bison --yacc -dv crowbar.y
+	$(CC) -c -o lex.yy.o lex.yy.c
+crowbar.tab.o: crowbar.y
+	bison -dv crowbar.y
+	$(CC) -c -o crowbar.tab.o crowbar.tab.c
 
-y.tab.o: y.tab.c y.tab.h $(INCLUDES)
-lex.yy.o: lex.yy.c $(INCLUDES)
 util/crb_trunk.o: util/crb_trunk.c $(INCLUDES)
 crb_type.o: crb_type.c $(INCLUDES)
 crb_expression.o: crb_expression.c $(INCLUDES)

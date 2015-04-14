@@ -4,7 +4,7 @@
 #include <string.h>
 #include "crb_type.h"
 #include "crb_expression.h"
-#include "y.tab.h"
+#include "crowbar.tab.h"
 
 static struct crb_string str;
 
