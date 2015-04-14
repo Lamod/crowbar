@@ -3,7 +3,7 @@
 #include "crb_type.h"
 #include "crb_expression.h"
 #include "crb_interpreter.h"
-#include "y.tab.h"
+#include "crowbar.tab.h"
 
 extern FILE *yyin;
 extern int yyparse();

@@ -6,12 +6,15 @@ OBJS=\
      crb_expression.o \
      crb_statement.o \
      crb_eval_exp.o \
+     crb_exec.o \
      crb_interpreter.o \
      y.tab.o \
      lex.yy.o \
      main.o
 INCLUDES=\
 	 crb_expression.h \
+	 crb_eval_exp.h \
+	 crb_exec.h \
 	 crb_type.h \
 	 crb_statement.h \
 	 crb_interpreter.h \
@@ -37,5 +40,6 @@ crb_type.o: crb_type.c $(INCLUDES)
 crb_expression.o: crb_expression.c $(INCLUDES)
 crb_statement.o: crb_statement.c $(INCLUDES)
 crb_interpreter.o: crb_interpreter.c $(INCLUDES)
-crb_eva_exp.o: crb_eval_exp.c $(INCLUDES)
+crb_eval_exp.o: crb_eval_exp.c $(INCLUDES)
+crb_exec.o: crb_exec.c $(INCLUDES)
 main.o: main.c $(INCLUDES)

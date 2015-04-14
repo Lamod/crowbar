@@ -1,4 +1,5 @@
 #include "crb_eval_exp.h"
+#include "crb_exec.h"
 #include "util/crb_util.h"
 #include <stdio.h>
 #include <assert.h>
@@ -332,7 +333,7 @@ static struct crb_value eval_function_call_exp(
 		crb_scope_set_variable(scope, name, crb_eval_exp(itp, exp));
 	}
 
-	struct crb_value r = crb_interpreter_exec_statements(itp,
+	struct crb_value r = crb_exec_statements(itp,
 			&func->statements);
 
 	if (scope != crb_interpreter_pop_scope(itp)) {

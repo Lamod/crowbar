@@ -1,5 +1,6 @@
 #include "crb_interpreter.h"
 #include "crb_eval_exp.h"
+#include "crb_exec.h"
 #include "util/crb_util.h"
 #include <string.h>
 #include <stdio.h>
@@ -108,47 +109,11 @@ struct crb_scope *crb_interpreter_pop_scope(struct crb_interpreter *itp)
 	return s;
 }
 
-static struct crb_value exec_statement(
-		struct crb_interpreter *itp,
-		struct crb_statement *statement)
-{
-	printf("%s statement: %p %d\n", __func__, statement, statement->type);
-
-	switch (statement->type) {
-	case CRB_EXP_STATEMENT:
-		crb_eval_exp(itp, statement->u.exp_statement.expression);
-		break;
-	case CRB_RETURN_STATEMENT:
-		return crb_eval_exp(itp, statement->u.return_statement.expression);
-	default:
-		break;
-	}
-
-	return CRB_NULL;
-}
-
-struct crb_value crb_interpreter_exec_statements(
-		struct crb_interpreter *itp,
-		const struct crb_trunk *statements)
-{
-	crb_assert(itp != NULL && statements != NULL && statements->count > 0,
-			crb_do_nothing);
-
-	struct crb_value r = CRB_NULL;
-	struct crb_statement *s = NULL;
-	for (int i = 0; i < statements->count; ++i) {
-		s = ((struct crb_statement **)statements->data)[i];
-		r = exec_statement(itp, s);
-	}
-
-	return r;
-}
-
 void crb_interpreter_run(struct crb_interpreter *itp)
 {
 	crb_assert(itp != NULL, crb_do_nothing);
 
 	crb_trunk_return_if_empty(&itp->statements);
 
-	crb_interpreter_exec_statements(itp, &itp->statements);
+	crb_exec_statements(itp, &itp->statements);
 }
