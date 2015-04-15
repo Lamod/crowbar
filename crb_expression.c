@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "crb_expression.h"
 #include "util/crb_util.h"
+#include "util/crb_trunk.h"
+#include "crb_statement.h"
 
 static char *exp_type_desc[] = {
 	"NONE", "BOOL", "INT", "DOUBLE", "STRING", "FUNCTION",
@@ -106,6 +108,53 @@ struct crb_expression *crb_create_expression(int type, void *value)
 #undef SETV
 
 	return e;
+}
+
+void crb_expression_free(struct crb_expression **pexp)
+{
+	if (pexp == NULL) {
+		return;
+	}
+
+	struct crb_expression *exp = *pexp;
+	if (exp == NULL) {
+		return;
+	}
+
+	switch (exp->type) {
+	case CRB_FUNCTION_EXPRESSION:
+	{
+		struct crb_trunk *statements = &exp->u.function_value.statements;
+		struct crb_statement *statement = NULL;
+		for (int i = statements->count - 1; i >= 0; --i) {
+			crb_trunk_read_element(statements, &statement, i);
+			crb_statement_free(&statement);
+		}
+		crb_trunk_destroy(statements);
+
+		crb_trunk_destroy(&exp->u.function_value.parameters);
+	}
+		break;
+	case CRB_IDENTIFIER_EXPRESSION:
+		break;
+	case CRB_FUNCTION_CALL_EXPRESSION:
+		break;
+	case CRB_BINARY_EXPRESSION:
+		crb_expression_free(&exp->u.binary_expression.left);
+		crb_expression_free(&exp->u.binary_expression.right);
+		break;
+	case CRB_ASSIGN_EXPRESSION:
+		crb_expression_free(&exp->u.assign_expression.exprand);
+		break;
+	case CRB_UNARY_EXPRESSION:
+		crb_expression_free(&exp->u.unary_expression.expression);
+		break;
+	default:
+		break;
+	}
+
+	free(exp);
+	*pexp = NULL;
 }
 
 struct crb_expression *crb_create_function_call_expression(

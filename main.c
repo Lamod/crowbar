@@ -29,5 +29,7 @@ int main(int argc, char *argv[])
 
 	crb_interpreter_run(itp);
 
+	crb_interpreter_free(&itp);
+
 	return 0;
 }

@@ -71,6 +71,40 @@ struct crb_interpreter *crb_create_interpreter(void)
 	return itp;
 }
 
+void crb_interpreter_free(struct crb_interpreter **pitp)
+{
+	if (pitp == NULL) {
+		return;
+	}
+
+	struct crb_interpreter *itp = *pitp;
+	if (itp == NULL) {
+		return;
+	}
+
+	//statements
+	
+	struct crb_statement *statement = NULL;
+	for (int i = itp->statements.count - 1; i >= 0; --i) {
+		crb_trunk_read_element(&itp->statements, &statement, i);
+		crb_statement_free(&statement);
+	}
+	crb_trunk_destroy(&itp->statements);
+
+	// scopes
+	
+	struct crb_scope *scope = NULL;
+	while (itp->top_scope != &itp->global_scope) {
+		scope = crb_interpreter_pop_scope(itp);
+		crb_trunk_destroy(scope);
+		free(scope);
+	}
+	crb_trunk_destroy(&itp->global_scope);
+
+	free(itp);
+	*pitp = NULL;
+}
+
 int crb_interpreter_set_global_variable(struct crb_interpreter *itp,
 		const char *variable,
 		struct crb_value value)

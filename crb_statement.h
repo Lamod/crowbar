@@ -26,6 +26,7 @@ struct crb_statement {
 };
 
 extern struct crb_statement *crb_create_statement(int type, void *value);
+extern void crb_statement_free(struct crb_statement **pstatement);
 
 #define crb_create_exp_statement(_e_) ({\
 	struct crb_exp_statement s = { .expression = (_e_) };\

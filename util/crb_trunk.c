@@ -25,6 +25,19 @@ int crb_trunk_init(void *trunk, size_t e_size, unsigned int capacity)
 	return 0;
 }
 
+void crb_trunk_destroy(void *trunk)
+{
+	if (trunk == NULL) {
+		return;
+	}
+
+	struct crb_trunk *t = CRB_TRUNK(trunk);
+	if (t->data != NULL) {
+		free(t->data);
+	}
+	memset(t, 0, sizeof(*t));
+}
+
 unsigned int crb_trunk_append(void *trunk, void *elements, unsigned int count)
 {
 	crb_assert(trunk != NULL, return 0);

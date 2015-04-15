@@ -39,3 +39,29 @@ struct crb_statement *crb_create_statement(int type, void *value)
 
 	return s;
 }
+
+void crb_statement_free(struct crb_statement **pstatement)
+{
+	if (pstatement == NULL) {
+		return;
+	}
+
+	struct crb_statement *statement = *pstatement;
+	if (statement == NULL) {
+		return;
+	}
+
+	switch (statement->type) {
+	case CRB_RETURN_STATEMENT:
+		crb_expression_free(&statement->u.return_statement.expression);
+		break;
+	case CRB_EXP_STATEMENT:
+		crb_expression_free(&statement->u.exp_statement.expression);
+		break;
+	default:
+		break;
+	}
+
+	free(statement);
+	*pstatement = NULL;
+}

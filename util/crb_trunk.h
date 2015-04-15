@@ -10,15 +10,17 @@ struct crb_trunk {
 };
 
 extern int crb_trunk_init(void *trunk, size_t e_size, unsigned int capacity);
+extern void crb_trunk_destroy(void *trunk);
+
 extern unsigned int crb_trunk_append(void *trunk, void *elements, unsigned int count);
 extern int crb_trunk_copy(void *dest, void *src, int count);
 extern int crb_trunk_min_copy(void *dest, void *src);
 
-#define crb_trunk_get_element(_t_, _type_, _idx_)\
-	((_type_)(_t_)->data)[_idx_]
+#define crb_trunk_get_element(_t_, _ptype_, _idx_)\
+	((_ptype_)(_t_)->data)[_idx_]
 
-#define crb_trunk_read_element(_t_, _var_, _idx_)\
-	(*(_var_) = crb_trunk_get_element(_t_, typeof(_var_), _idx_))
+#define crb_trunk_read_element(_t_, _pvar_, _idx_)\
+	(*(_pvar_) = crb_trunk_get_element(_t_, typeof(_pvar_), _idx_))
 
 #define crb_trunk_return_if_empty(_t_) do{\
 	if ((_t_)->count == 0) {\

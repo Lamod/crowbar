@@ -100,6 +100,7 @@ struct crb_expression {
 		|| (_o_) == CRB_BINARY_OPERATOR_NE)
 
 extern struct crb_expression *crb_create_expression(int type, void *value);
+extern void crb_expression_free(struct crb_expression **pexp);
 
 #define crb_create_int_expression(_v_) ({\
 	int v = (_v_);\

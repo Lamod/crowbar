@@ -26,9 +26,8 @@ extern struct crb_value crb_scope_get_variable(struct crb_scope *scope,
 		const char *variable, int deep);
 
 extern struct crb_interpreter *crb_create_interpreter(void);
-extern struct crb_value crb_interpreter_exec_statements(
-		struct crb_interpreter *itp,
-		const struct crb_trunk *statements);
+extern void crb_interpreter_free(struct crb_interpreter **pitp);
+
 extern void crb_interpreter_run(struct crb_interpreter *itp);
 
 extern struct crb_scope *crb_interpreter_pop_scope(struct crb_interpreter *itp);
