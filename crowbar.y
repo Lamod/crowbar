@@ -28,12 +28,12 @@ extern struct crb_interpreter *itp;
 %token 	<expression> TRUE FALSE
 %token 	ADD SUB MUL DIV MOD LP RP LC RC GT GE LT LE EQ NE
 	LOGICAL_AND LOGICAL_OR INVERT ASSIGN SEMICOLON COMMA
-	FUNCTION RETURN
+	FUNCTION RETURN IF ELSE
 %type 	<expression> expression logical_or_expression logical_and_expression
 	equality_expression relational_expression additive_expression
 	multiplicative_expression unary_expression primary_expression
 	function_defination
-%type	<statement> statement function_defination_statement
+%type	<statement> statement function_defination_statement if_statement
 %type	<statements> statement_list block
 %type	<parameters> parameter_list
 %type	<arguments> argument_list
@@ -69,6 +69,7 @@ statement
 		$$ = crb_create_return_statement($2);
 	}
 	| function_defination_statement
+	| if_statement
 	;
 function_defination_statement
 	:FUNCTION IDENTIFIER LP parameter_list RP block
@@ -77,6 +78,27 @@ function_defination_statement
 		struct crb_expression *func_exp = crb_create_function_expression(f);
 		struct crb_expression *assign_exp = crb_create_assign_expression($2, func_exp);
 		$$ = crb_create_exp_statement(assign_exp);
+	}
+	;
+if_statement
+	: IF expression block
+	{
+		struct crb_if_statement if_statement = { .condition = $2, .main_statements = $3 };
+		$$ = crb_create_statement(CRB_IF_STATEMENT, &if_statement);
+	}
+	| if_statement ELSE block
+	{
+		$1->u.if_statement.else_branch.type = CRB_ELSE_BRANCH;
+		$1->u.if_statement.else_branch.u.else_statements = $3;
+
+		$$ = $1;
+	}
+	| if_statement ELSE if_statement
+	{
+		$1->u.if_statement.else_branch.type = CRB_ELSE_IF_BRANCH;
+		$1->u.if_statement.else_branch.u.else_if_statement = $3;
+
+		$$ = $1;
 	}
 	;
 expression
@@ -224,7 +246,11 @@ parameter_list
 	}
 	;
 block
-	: LC statement_list RC
+	: LC RC
+	{
+		$$ = (struct crb_trunk){0};
+	}
+	| LC statement_list RC
 	{
 		$$ = $2;
 	}

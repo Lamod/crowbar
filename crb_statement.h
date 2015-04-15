@@ -6,11 +6,31 @@
 enum {
 	CRB_STATEMENT_TYPE_NONE,
 	CRB_EXP_STATEMENT,
+	CRB_IF_STATEMENT,
 	CRB_RETURN_STATEMENT,
 };
 
 struct crb_exp_statement {
 	struct crb_expression *expression;
+};
+
+enum {
+	CRB_ELSE_BRANCH_TYPE_NONE,
+	CRB_ELSE_BRANCH,
+	CRB_ELSE_IF_BRANCH
+};
+
+struct crb_if_statement {
+	struct crb_expression *condition;
+	struct crb_trunk main_statements;
+
+	struct {
+		int type;
+		union {
+			struct crb_trunk else_statements;
+			struct crb_statement *else_if_statement;
+		} u;
+	} else_branch;
 };
 
 struct crb_return_statement {
@@ -21,6 +41,7 @@ struct crb_statement {
 	int type;
 	union {
 		struct crb_exp_statement exp_statement;
+		struct crb_if_statement if_statement;
 		struct crb_return_statement return_statement;
 	} u;
 };

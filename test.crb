@@ -8,3 +8,17 @@ add = function(a, b) {
 
 binary(add, 3, 4);
 binary(function(a, b) { a * b; }, 3, 7);
+
+div = function(a, b) {
+	if b == 0 {
+		0;
+	} else if b == 1 {
+		a;
+	} else {
+		a / b;
+	}
+};
+
+div(5, 0);
+div(5, 1);
+div(5, 2);
