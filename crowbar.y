@@ -21,6 +21,8 @@ extern struct crb_interpreter *itp;
 	struct crb_stack parameters;
 	struct crb_stack statements;
 	struct crb_stack arguments;
+
+	struct crb_block block;
 }
 
 %token 	<expression> INTEGER_LITERAL FLOAT_LITERAL STRING_LITERAL
@@ -36,16 +38,19 @@ extern struct crb_interpreter *itp;
 	function_defination
 %type	<statement> statement function_defination_statement if_statement
 	for_statement
-%type	<statements> statement_list block
+%type	<statements> statement_list
+%type	<block> block global_block
 %type	<parameters> parameter_list
 %type	<arguments> argument_list
 
 %%
 
-global_statement_list
+global_block
 	:statement_list
 	{
-		itp->statements = $1;
+		$$.type = CRB_GLOBAL_BLOCK;
+		$$.statements = $1;
+		itp->global_block = $$;
 	}
 	;
 statement_list
@@ -77,7 +82,12 @@ statement
 function_defination_statement
 	:FUNCTION IDENTIFIER LP parameter_list RP block
 	{
-		struct crb_function f = { .parameters = $4, .statements = $6 };
+		$6.type = CRB_FUNCTION_BLOCK;
+		struct crb_function f = {
+			.parameters = $4,
+			.block = $6
+		};
+
 		struct crb_expression *func_exp = crb_create_function_expression(f);
 		struct crb_expression *assign_exp = crb_create_assign_expression($2, func_exp);
 		$$ = crb_create_exp_statement(assign_exp);
@@ -86,13 +96,19 @@ function_defination_statement
 if_statement
 	: IF expression block
 	{
-		struct crb_if_statement if_statement = { .condition = $2, .main_statements = $3 };
+		$3.type = CRB_IF_STATEMENT_BLOCK;
+		struct crb_if_statement if_statement = {
+			.condition = $2,
+			.main_block = $3
+		};
+
 		$$ = crb_create_statement(CRB_IF_STATEMENT, &if_statement);
 	}
 	| if_statement ELSE block
 	{
+		$3.type = CRB_IF_STATEMENT_BLOCK;
 		$1->u.if_statement.else_branch.type = CRB_ELSE_BRANCH;
-		$1->u.if_statement.else_branch.u.else_statements = $3;
+		$1->u.if_statement.else_branch.u.else_block = $3;
 
 		$$ = $1;
 	}
@@ -107,17 +123,28 @@ if_statement
 for_statement
 	: FOR block
 	{
-		struct crb_for_statement for_statement = { .statements = $2 };
+		$2.type = CRB_FOR_STATEMENT_BLOCK;
+		struct crb_for_statement for_statement = { .block = $2 };
+
 		$$ = crb_create_statement(CRB_FOR_STATEMENT, &for_statement);
 	}
 	| FOR expression_opt SEMICOLON expression SEMICOLON expression_opt block
 	{
-		struct crb_for_statement for_statement = { .init = $2, .condition = $4, .post = $6, .statements = $7 };
+		$7.type = CRB_FOR_STATEMENT_BLOCK;
+		struct crb_for_statement for_statement = {
+			.init = $2,
+			.condition = $4,
+			.post = $6,
+			.block = $7
+		};
+
 		$$ = crb_create_statement(CRB_FOR_STATEMENT, &for_statement);
 	}
 	;
 expression_opt
 	: /* empty */
+	{
+	}
 	| expression
 	;
 expression
@@ -247,7 +274,7 @@ argument_list
 function_defination
 	:FUNCTION LP parameter_list RP block
 	{
-		struct crb_function f = { .parameters = $3, .statements = $5 };
+		struct crb_function f = { .parameters = $3, .block = $5 };
 		$$ = crb_create_function_expression(f);
 	}
 	;
@@ -267,11 +294,11 @@ parameter_list
 block
 	: LC RC
 	{
-		$$ = (struct crb_stack){0};
+		$$ = (struct crb_block){0};
 	}
 	| LC statement_list RC
 	{
-		$$ = $2;
+		$$.statements = $2;
 	}
 	;
 %%

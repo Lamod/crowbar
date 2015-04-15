@@ -85,11 +85,11 @@ void crb_interpreter_free(struct crb_interpreter **pitp)
 	//statements
 	
 	struct crb_statement *statement = NULL;
-	for (int i = itp->statements.count - 1; i >= 0; --i) {
-		crb_stack_read_element(&itp->statements, &statement, i);
+	for (int i = itp->global_block.statements.count - 1; i >= 0; --i) {
+		crb_stack_read_element(&itp->global_block.statements, &statement, i);
 		crb_statement_free(&statement);
 	}
-	crb_stack_destroy(&itp->statements);
+	crb_stack_destroy(&itp->global_block.statements);
 
 	// scopes
 	
@@ -147,7 +147,7 @@ void crb_interpreter_run(struct crb_interpreter *itp)
 {
 	crb_assert(itp != NULL, crb_do_nothing);
 
-	crb_stack_return_if_empty(&itp->statements);
+	crb_stack_return_if_empty(&itp->global_block.statements);
 
-	crb_exec_statements(itp, &itp->statements);
+	crb_exec_block(itp, &itp->global_block);
 }

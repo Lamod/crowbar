@@ -4,13 +4,13 @@
 #include <stdio.h>
 #include <assert.h>
 
-static struct crb_statement_result exec_statement(
+static struct crb_block_result exec_statement(
 		struct crb_interpreter *itp,
 		struct crb_statement *statement)
 {
 	printf("%s statement: %p %d\n", __func__, statement, statement->type);
 
-	struct crb_statement_result result = {0};
+	struct crb_block_result result = {0};
 
 	switch (statement->type) {
 	case CRB_EXP_STATEMENT:
@@ -25,13 +25,13 @@ static struct crb_statement_result exec_statement(
 		}
 		
 		if (condition_result.u.boolean_value != 0) {
-			result = crb_exec_statements(itp, &if_statement->main_statements);
+			result = crb_exec_block(itp, &if_statement->main_block);
 			break;
 		}
 
 		switch (if_statement->else_branch.type) {
 		case CRB_ELSE_BRANCH:
-			result = crb_exec_statements(itp, &if_statement->else_branch.u.else_statements);
+			result = crb_exec_block(itp, &if_statement->else_branch.u.else_block);
 			break;
 		case CRB_ELSE_IF_BRANCH:
 			result = exec_statement(itp, if_statement->else_branch.u.else_if_statement);
@@ -61,7 +61,7 @@ static struct crb_statement_result exec_statement(
 				}
 			}
 
-			result = crb_exec_statements(itp, &for_statement->statements);
+			result = crb_exec_block(itp, &for_statement->block);
 			if (result.is_return_statement) {
 				break;
 			}
@@ -90,17 +90,17 @@ static struct crb_statement_result exec_statement(
 	return result;
 }
 
-struct crb_statement_result crb_exec_statements(
+struct crb_block_result crb_exec_block(
 		struct crb_interpreter *itp,
-		const struct crb_stack *statements)
+		const struct crb_block *block)
 {
-	crb_assert(itp != NULL && statements != NULL && statements->count > 0,
+	crb_assert(itp != NULL && block != NULL && block->statements.count > 0,
 			crb_do_nothing);
 
-	struct crb_statement_result result = {0};
+	struct crb_block_result result = {0};
 	struct crb_statement *statement = NULL;
-	for (int i = 0; i < statements->count; ++i) {
-		statement = ((struct crb_statement **)statements->data)[i];
+	for (int i = 0; i < block->statements.count; ++i) {
+		statement = ((struct crb_statement **)block->statements.data)[i];
 		result = exec_statement(itp, statement);
 		if (result.is_return_statement != 0) {
 			break;

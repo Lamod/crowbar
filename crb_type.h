@@ -12,8 +12,14 @@ extern int crb_string_init(struct crb_string *str, size_t capacity);
 extern int crb_string_append_char(struct crb_string *str, char c);
 extern size_t crb_string_append_chars(struct crb_string *str, char *chars);
 
+struct crb_block {
+	int type;
+	struct crb_stack statements;
+};
+
 struct crb_function {
-	struct crb_stack parameters, statements;
+	struct crb_stack parameters;
+	struct crb_block block;
 };
 
 enum {

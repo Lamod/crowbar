@@ -16,7 +16,7 @@ struct crb_scope {
 };
 
 struct crb_interpreter {
-	struct crb_stack statements;
+	struct crb_block global_block;
 	struct crb_scope global_scope, *top_scope;
 };
 

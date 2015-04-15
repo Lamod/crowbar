@@ -333,7 +333,7 @@ static struct crb_value eval_function_call_exp(
 		crb_scope_set_variable(scope, name, crb_eval_exp(itp, exp));
 	}
 
-	struct crb_value r = crb_exec_statements(itp, &func->statements).value;
+	struct crb_value r = crb_exec_block(itp, &func->block).value;
 
 	if (scope != crb_interpreter_pop_scope(itp)) {
 		crb_panic(return CRB_NULL);

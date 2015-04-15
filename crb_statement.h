@@ -1,7 +1,16 @@
 #ifndef CRB_STATEMENT_H
 #define CRB_STATEMENT_H
 
+#include "crb_type.h"
 #include "crb_expression.h"
+
+enum {
+	CRB_BLOCK_TYPE_NONE,
+	CRB_GLOBAL_BLOCK,
+	CRB_FUNCTION_BLOCK,
+	CRB_IF_STATEMENT_BLOCK,
+	CRB_FOR_STATEMENT_BLOCK
+};
 
 enum {
 	CRB_STATEMENT_TYPE_NONE,
@@ -23,12 +32,12 @@ enum {
 
 struct crb_if_statement {
 	struct crb_expression *condition;
-	struct crb_stack main_statements;
+	struct crb_block main_block;
 
 	struct {
 		int type;
 		union {
-			struct crb_stack else_statements;
+			struct crb_block else_block;
 			struct crb_statement *else_if_statement;
 		} u;
 	} else_branch;
@@ -37,7 +46,7 @@ struct crb_if_statement {
 struct crb_for_statement {
 	struct crb_expression *init, *condition, *post;
 
-	struct crb_stack statements;
+	struct crb_block block;
 };
 
 struct crb_return_statement {
