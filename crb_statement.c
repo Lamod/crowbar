@@ -61,6 +61,55 @@ void crb_statement_free(struct crb_statement **pstatement)
 	case CRB_RETURN_STATEMENT:
 		crb_expression_free(&statement->u.return_statement.expression);
 		break;
+	case CRB_IF_STATEMENT:
+	{
+		struct crb_if_statement *if_statement = &statement->u.if_statement;
+
+		crb_expression_free(&if_statement->condition);
+
+		struct crb_statement *statement = NULL;
+		for (int i = if_statement->main_statements.count - 1; i >= 0; --i) {
+			crb_stack_read_element(&if_statement->main_statements, &statement, i);
+			crb_statement_free(&statement);
+		}
+		crb_stack_destroy(&if_statement->main_statements);
+
+		switch (if_statement->else_branch.type) {
+		case CRB_ELSE_BRANCH:
+		{
+			struct crb_stack *statements = &if_statement->else_branch.u.else_statements;
+			struct crb_statement *statement = NULL;
+			for (int i = statements->count - 1; i >= 0; --i) {
+				crb_stack_read_element(statements, &statement, i);
+				crb_statement_free(&statement);
+			}
+			crb_stack_destroy(statements);
+		}
+			break;
+		case CRB_ELSE_IF_BRANCH:
+			crb_statement_free(&if_statement->else_branch.u.else_if_statement);
+			break;
+		default:
+			break;
+		}
+	}
+		break;
+	case CRB_FOR_STATEMENT:
+	{
+		struct crb_for_statement *for_statement = &statement->u.for_statement;
+
+		crb_expression_free(&for_statement->init);
+		crb_expression_free(&for_statement->condition);
+		crb_expression_free(&for_statement->post);
+
+		struct crb_statement *statement = NULL;
+		for (int i = for_statement->statements.count - 1; i >= 0; --i) {
+			crb_stack_read_element(&for_statement->statements, &statement, i);
+			crb_statement_free(&statement);
+		}
+		crb_stack_destroy(&for_statement->statements);
+	}
+		break;
 	case CRB_EXP_STATEMENT:
 		crb_expression_free(&statement->u.exp_statement.expression);
 		break;
