@@ -50,7 +50,7 @@ static struct crb_statement_result exec_statement(
 			crb_eval_exp(itp, for_statement->init);
 		}
 		while (1) {
-			if (!for_statement->is_infinite && for_statement->condition != NULL) {
+			if (for_statement->condition != NULL) {
 				struct crb_value v = crb_eval_exp(itp, for_statement->condition); 
 				if (!crb_is_boolean_value(v)) {
 					assert(0);

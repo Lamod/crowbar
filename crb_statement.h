@@ -35,7 +35,6 @@ struct crb_if_statement {
 };
 
 struct crb_for_statement {
-	int is_infinite;
 	struct crb_expression *init, *condition, *post;
 
 	struct crb_stack statements;

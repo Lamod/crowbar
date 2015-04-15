@@ -29,7 +29,8 @@ extern struct crb_interpreter *itp;
 %token 	ADD SUB MUL DIV MOD LP RP LC RC GT GE LT LE EQ NE
 	LOGICAL_AND LOGICAL_OR INVERT ASSIGN SEMICOLON COMMA
 	FUNCTION RETURN IF ELSE FOR
-%type 	<expression> expression logical_or_expression logical_and_expression
+%type 	<expression> expression_opt expression
+	logical_or_expression logical_and_expression
 	equality_expression relational_expression additive_expression
 	multiplicative_expression unary_expression primary_expression
 	function_defination
@@ -106,14 +107,18 @@ if_statement
 for_statement
 	: FOR block
 	{
-		struct crb_for_statement for_statement = { .is_infinite = 1, .statements = $2 };
+		struct crb_for_statement for_statement = { .statements = $2 };
 		$$ = crb_create_statement(CRB_FOR_STATEMENT, &for_statement);
 	}
-	| FOR expression SEMICOLON expression SEMICOLON expression block
+	| FOR expression_opt SEMICOLON expression SEMICOLON expression_opt block
 	{
 		struct crb_for_statement for_statement = { .init = $2, .condition = $4, .post = $6, .statements = $7 };
 		$$ = crb_create_statement(CRB_FOR_STATEMENT, &for_statement);
 	}
+	;
+expression_opt
+	: /* empty */
+	| expression
 	;
 expression
 	: logical_or_expression
