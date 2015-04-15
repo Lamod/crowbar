@@ -7,6 +7,7 @@ enum {
 	CRB_STATEMENT_TYPE_NONE,
 	CRB_EXP_STATEMENT,
 	CRB_IF_STATEMENT,
+	CRB_FOR_STATEMENT,
 	CRB_RETURN_STATEMENT,
 };
 
@@ -33,6 +34,13 @@ struct crb_if_statement {
 	} else_branch;
 };
 
+struct crb_for_statement {
+	int is_infinite;
+	struct crb_expression *init, *condition, *post;
+
+	struct crb_stack statements;
+};
+
 struct crb_return_statement {
 	struct crb_expression *expression;
 };
@@ -42,6 +50,7 @@ struct crb_statement {
 	union {
 		struct crb_exp_statement exp_statement;
 		struct crb_if_statement if_statement;
+		struct crb_for_statement for_statement;
 		struct crb_return_statement return_statement;
 	} u;
 };

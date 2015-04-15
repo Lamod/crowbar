@@ -42,6 +42,36 @@ static struct crb_statement_result exec_statement(
 		}
 	}
 		break;
+	case CRB_FOR_STATEMENT:
+	{
+		struct crb_for_statement *for_statement = &statement->u.for_statement;
+
+		if (for_statement->init != NULL) {
+			crb_eval_exp(itp, for_statement->init);
+		}
+		while (1) {
+			if (!for_statement->is_infinite && for_statement->condition != NULL) {
+				struct crb_value v = crb_eval_exp(itp, for_statement->condition); 
+				if (!crb_is_boolean_value(v)) {
+					assert(0);
+				}
+
+				if (v.u.boolean_value == 0) {
+					break;
+				}
+			}
+
+			result = crb_exec_statements(itp, &for_statement->statements);
+			if (result.is_return_statement) {
+				break;
+			}
+
+			if (for_statement->post != NULL) {
+				crb_eval_exp(itp, for_statement->post);
+			}
+		}
+	}
+		break;
 	case CRB_RETURN_STATEMENT:
 		result.is_return_statement = 1;
 		result.value = crb_eval_exp(itp, statement->u.return_statement.expression);

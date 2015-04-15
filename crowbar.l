@@ -47,6 +47,7 @@ FLOAT (0?|{INTEGER})\.[0-9]+
 <INITIAL>"return"	return RETURN;
 <INITIAL>"if"		return IF;
 <INITIAL>"else"		return ELSE;
+<INITIAL>"for"		return FOR;
 <INITIAL>"true" {
 	yylval.expression = crb_create_boolean_expression(1);
 

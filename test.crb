@@ -22,3 +22,8 @@ div = function(a, b) {
 div(5, 0);
 div(5, 1);
 div(5, 2);
+
+sum = 0;
+for i = 0; i < 100; i = i + 1 {
+	sum = sum + i;
+}
