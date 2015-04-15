@@ -6,17 +6,17 @@
 
 int crb_string_init(struct crb_string *str, size_t capacity)
 {
-	return crb_trunk_init(str, sizeof(char), capacity);
+	return crb_stack_init(str, sizeof(char), capacity);
 }
 
 int crb_string_append_char(struct crb_string *str, char c)
 {
-	return crb_trunk_append(str, &c, 1);
+	return crb_stack_append(str, &c, 1);
 }
 
 size_t crb_string_append_chars(struct crb_string *str, char *chars)
 {
-	int r = crb_trunk_append(str, chars, strlen(chars));
+	int r = crb_stack_append(str, chars, strlen(chars));
 
 	if (r > 0 && str->count == str->capacity) {
 		crb_string_append_char(str, '\0');

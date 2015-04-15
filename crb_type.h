@@ -1,11 +1,11 @@
 #ifndef CRB_TYPE_H
 #define CRB_TYPE_H
 
-#include "util/crb_trunk.h"
+#include "util/crb_stack.h"
 #include <stdlib.h>
 
 struct crb_string {
-	CRB_TRUNK_HEADER;
+	CRB_STACK_HEADER;
 };
 
 extern int crb_string_init(struct crb_string *str, size_t capacity);
@@ -13,7 +13,7 @@ extern int crb_string_append_char(struct crb_string *str, char c);
 extern size_t crb_string_append_chars(struct crb_string *str, char *chars);
 
 struct crb_function {
-	struct crb_trunk parameters, statements;
+	struct crb_stack parameters, statements;
 };
 
 enum {

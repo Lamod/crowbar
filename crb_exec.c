@@ -62,7 +62,7 @@ static struct crb_statement_result exec_statement(
 
 struct crb_statement_result crb_exec_statements(
 		struct crb_interpreter *itp,
-		const struct crb_trunk *statements)
+		const struct crb_stack *statements)
 {
 	crb_assert(itp != NULL && statements != NULL && statements->count > 0,
 			crb_do_nothing);

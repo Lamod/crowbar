@@ -327,8 +327,8 @@ static struct crb_value eval_function_call_exp(
 	const struct crb_expression *exp = NULL;
 
 	for (int i = 0; i < func->parameters.count; ++i) {
-		crb_trunk_read_element(&func->parameters, &name, i);
-		crb_trunk_read_element(&fe->arguments, &exp, i);
+		crb_stack_read_element(&func->parameters, &name, i);
+		crb_stack_read_element(&fe->arguments, &exp, i);
 
 		crb_scope_set_variable(scope, name, crb_eval_exp(itp, exp));
 	}

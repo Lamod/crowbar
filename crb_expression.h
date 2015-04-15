@@ -44,7 +44,7 @@ struct crb_expression;
 
 struct crb_function_call_expression {
 	const char *function_name;
-	const struct crb_trunk arguments;
+	const struct crb_stack arguments;
 };
 
 struct crb_binary_expression {
@@ -134,7 +134,7 @@ extern void crb_expression_free(struct crb_expression **pexp);
 
 extern struct crb_expression *crb_create_function_call_expression(
 		const char *function,
-		const struct crb_trunk *arguments);
+		const struct crb_stack *arguments);
 
 extern struct crb_expression *crb_create_binary_expression(int opr,
 		const struct crb_expression *left,

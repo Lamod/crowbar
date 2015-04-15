@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "crb_expression.h"
 #include "util/crb_util.h"
-#include "util/crb_trunk.h"
+#include "util/crb_stack.h"
 #include "crb_statement.h"
 
 static char *exp_type_desc[] = {
@@ -124,15 +124,15 @@ void crb_expression_free(struct crb_expression **pexp)
 	switch (exp->type) {
 	case CRB_FUNCTION_EXPRESSION:
 	{
-		struct crb_trunk *statements = &exp->u.function_value.statements;
+		struct crb_stack *statements = &exp->u.function_value.statements;
 		struct crb_statement *statement = NULL;
 		for (int i = statements->count - 1; i >= 0; --i) {
-			crb_trunk_read_element(statements, &statement, i);
+			crb_stack_read_element(statements, &statement, i);
 			crb_statement_free(&statement);
 		}
-		crb_trunk_destroy(statements);
+		crb_stack_destroy(statements);
 
-		crb_trunk_destroy(&exp->u.function_value.parameters);
+		crb_stack_destroy(&exp->u.function_value.parameters);
 	}
 		break;
 	case CRB_IDENTIFIER_EXPRESSION:
@@ -159,13 +159,13 @@ void crb_expression_free(struct crb_expression **pexp)
 
 struct crb_expression *crb_create_function_call_expression(
 		const char *function,
-		const struct crb_trunk *arguments)
+		const struct crb_stack *arguments)
 {
 	crb_assert(function != NULL, return NULL);
 
 	struct crb_function_call_expression fe = {
 		.function_name = function,
-		.arguments = arguments ? *arguments : (struct crb_trunk){0}
+		.arguments = arguments ? *arguments : (struct crb_stack){0}
 	};
 
 	return crb_create_expression(CRB_FUNCTION_CALL_EXPRESSION, &fe);

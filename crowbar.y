@@ -6,7 +6,7 @@
 #include "crb_statement.h"
 #include "crb_eval_exp.h"
 #include "crb_interpreter.h"
-#include "util/crb_trunk.h"
+#include "util/crb_stack.h"
 
 extern struct crb_interpreter *itp;
 
@@ -18,9 +18,9 @@ extern struct crb_interpreter *itp;
 	struct crb_expression *expression;
 	struct crb_statement *statement;
 
-	struct crb_trunk parameters;
-	struct crb_trunk statements;
-	struct crb_trunk arguments;
+	struct crb_stack parameters;
+	struct crb_stack statements;
+	struct crb_stack arguments;
 }
 
 %token 	<expression> INTEGER_LITERAL FLOAT_LITERAL STRING_LITERAL
@@ -49,12 +49,12 @@ global_statement_list
 statement_list
 	:statement
 	{
-		crb_trunk_init(&$$, sizeof($1), 1);
-		crb_trunk_append(&$$, &$1, 1);
+		crb_stack_init(&$$, sizeof($1), 1);
+		crb_stack_append(&$$, &$1, 1);
 	}
 	|statement_list statement
 	{ 
-		crb_trunk_append(&$1, &$2, 1);
+		crb_stack_append(&$1, &$2, 1);
 		
 		$$ = $1;
 	}
@@ -216,12 +216,12 @@ primary_expression
 argument_list
 	:expression
 	{
-		crb_trunk_init(&$$, sizeof($1), 1);
-		crb_trunk_append(&$$, &$1, 1);
+		crb_stack_init(&$$, sizeof($1), 1);
+		crb_stack_append(&$$, &$1, 1);
 	}
 	|argument_list COMMA expression
 	{
-		crb_trunk_append(&$1, &$3, 1);
+		crb_stack_append(&$1, &$3, 1);
 		$$ = $1;
 	}
 	;
@@ -235,12 +235,12 @@ function_defination
 parameter_list
 	:IDENTIFIER
 	{
-		crb_trunk_init(&$$, sizeof($1), 1);
-		crb_trunk_append(&$$, &$1, 1);
+		crb_stack_init(&$$, sizeof($1), 1);
+		crb_stack_append(&$$, &$1, 1);
 	}
 	|parameter_list COMMA IDENTIFIER
 	{
-		crb_trunk_append(&$1, &$3, 1);
+		crb_stack_append(&$1, &$3, 1);
 
 		$$ = $1;
 	}
@@ -248,7 +248,7 @@ parameter_list
 block
 	: LC RC
 	{
-		$$ = (struct crb_trunk){0};
+		$$ = (struct crb_stack){0};
 	}
 	| LC statement_list RC
 	{

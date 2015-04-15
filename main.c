@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "util/crb_trunk.h"
+#include "util/crb_stack.h"
 #include "crb_type.h"
 #include "crb_expression.h"
 #include "crb_interpreter.h"

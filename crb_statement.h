@@ -22,12 +22,12 @@ enum {
 
 struct crb_if_statement {
 	struct crb_expression *condition;
-	struct crb_trunk main_statements;
+	struct crb_stack main_statements;
 
 	struct {
 		int type;
 		union {
-			struct crb_trunk else_statements;
+			struct crb_stack else_statements;
 			struct crb_statement *else_if_statement;
 		} u;
 	} else_branch;

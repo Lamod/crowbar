@@ -9,4 +9,4 @@ struct crb_statement_result {
 
 extern struct crb_statement_result crb_exec_statements(
 		struct crb_interpreter *itp,
-		const struct crb_trunk *statements);
+		const struct crb_stack *statements);

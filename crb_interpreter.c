@@ -31,7 +31,7 @@ int crb_scope_set_variable(struct crb_scope *scope,
 		.value = value
 	};
 
-	return crb_trunk_append(&scope->variables, &var, 1) == 1 ? 0 : 1;
+	return crb_stack_append(&scope->variables, &var, 1) == 1 ? 0 : 1;
 }
 
 struct crb_value crb_scope_get_variable(struct crb_scope *scope,
@@ -66,7 +66,7 @@ struct crb_interpreter *crb_create_interpreter(void)
 
 	itp->top_scope = &(itp->global_scope);
 
-	crb_trunk_init(&itp->global_scope, sizeof(struct crb_variable), 50);
+	crb_stack_init(&itp->global_scope, sizeof(struct crb_variable), 50);
 
 	return itp;
 }
@@ -86,20 +86,20 @@ void crb_interpreter_free(struct crb_interpreter **pitp)
 	
 	struct crb_statement *statement = NULL;
 	for (int i = itp->statements.count - 1; i >= 0; --i) {
-		crb_trunk_read_element(&itp->statements, &statement, i);
+		crb_stack_read_element(&itp->statements, &statement, i);
 		crb_statement_free(&statement);
 	}
-	crb_trunk_destroy(&itp->statements);
+	crb_stack_destroy(&itp->statements);
 
 	// scopes
 	
 	struct crb_scope *scope = NULL;
 	while (itp->top_scope != &itp->global_scope) {
 		scope = crb_interpreter_pop_scope(itp);
-		crb_trunk_destroy(scope);
+		crb_stack_destroy(scope);
 		free(scope);
 	}
-	crb_trunk_destroy(&itp->global_scope);
+	crb_stack_destroy(&itp->global_scope);
 
 	free(itp);
 	*pitp = NULL;
@@ -125,7 +125,7 @@ struct crb_value crb_interpreter_get_global_variable(struct crb_interpreter *itp
 struct crb_scope *crb_interpreter_push_scope(struct crb_interpreter *itp) 
 {
 	struct crb_scope *s = calloc(sizeof(*s), 1);
-	crb_trunk_init(&s->variables, sizeof(struct crb_variable), 10);
+	crb_stack_init(&s->variables, sizeof(struct crb_variable), 10);
 
 	s->next = itp->top_scope;
 	itp->top_scope = s;
@@ -147,7 +147,7 @@ void crb_interpreter_run(struct crb_interpreter *itp)
 {
 	crb_assert(itp != NULL, crb_do_nothing);
 
-	crb_trunk_return_if_empty(&itp->statements);
+	crb_stack_return_if_empty(&itp->statements);
 
 	crb_exec_statements(itp, &itp->statements);
 }
