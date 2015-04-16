@@ -38,7 +38,7 @@ void crb_value_print(struct crb_value v)
 		printf("null");
 		break;
 	case CRB_BOOLEAN_VALUE:
-		printf("boolean: %s", v.u.boolean_value ? "true" : "false");
+		printf("boolean: %s", crb_is_true(v) ? "true" : "false");
 		break;
 	case CRB_INT_VALUE:
 		printf("int: %d", v.u.int_value);

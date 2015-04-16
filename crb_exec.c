@@ -43,7 +43,7 @@ static struct crb_block_result exec_statement(
 			assert(0);
 		}
 		
-		if (condition_result.u.boolean_value != 0) {
+		if (crb_is_true(condition_result)) {
 			result = exec_block(itp, &if_statement->main_block);
 			break;
 		}
@@ -74,7 +74,7 @@ static struct crb_block_result exec_statement(
 					assert(0);
 				}
 
-				if (v.u.boolean_value == 0) {
+				if (crb_is_false(v)) {
 					break;
 				}
 			}
