@@ -129,10 +129,10 @@ if_statement
 	}
 	;
 for_statement
-	: FOR block
+	: FOR expression_opt block
 	{
-		$2.type = CRB_FOR_STATEMENT_BLOCK;
-		struct crb_for_statement for_statement = { .block = $2 };
+		$3.type = CRB_FOR_STATEMENT_BLOCK;
+		struct crb_for_statement for_statement = { .condition = $2, .block = $3 };
 
 		$$ = crb_create_statement(CRB_FOR_STATEMENT, &for_statement);
 	}
