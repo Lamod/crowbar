@@ -84,11 +84,6 @@ void crb_interpreter_free(struct crb_interpreter **pitp)
 
 	//statements
 	
-	struct crb_statement *statement = NULL;
-	for (int i = itp->global_block.statements.count - 1; i >= 0; --i) {
-		crb_stack_read_element(&itp->global_block.statements, &statement, i);
-		crb_statement_free(&statement);
-	}
 	crb_stack_destroy(&itp->global_block.statements);
 
 	// scopes

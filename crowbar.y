@@ -57,6 +57,8 @@ statement_list
 	:statement
 	{
 		crb_stack_init(&$$, sizeof($1), 1);
+		$$.destroy_func = (crb_element_destroy_func)&crb_statement_free;
+
 		crb_stack_append(&$$, &$1, 1);
 	}
 	|statement_list statement

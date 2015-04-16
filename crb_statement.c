@@ -70,25 +70,11 @@ void crb_statement_free(struct crb_statement **pstatement)
 		struct crb_if_statement *if_statement = &statement->u.if_statement;
 
 		crb_expression_free(&if_statement->condition);
-
-		struct crb_statement *statement = NULL;
-		for (int i = if_statement->main_block.statements.count - 1; i >= 0; --i) {
-			crb_stack_read_element(&if_statement->main_block.statements, &statement, i);
-			crb_statement_free(&statement);
-		}
 		crb_stack_destroy(&if_statement->main_block.statements);
 
 		switch (if_statement->else_branch.type) {
 		case CRB_ELSE_BRANCH:
-		{
-			struct crb_stack *statements = &if_statement->else_branch.u.else_block.statements;
-			struct crb_statement *statement = NULL;
-			for (int i = statements->count - 1; i >= 0; --i) {
-				crb_stack_read_element(statements, &statement, i);
-				crb_statement_free(&statement);
-			}
-			crb_stack_destroy(statements);
-		}
+			crb_stack_destroy(&if_statement->else_branch.u.else_block.statements);
 			break;
 		case CRB_ELSE_IF_BRANCH:
 			crb_statement_free(&if_statement->else_branch.u.else_if_statement);
@@ -106,11 +92,6 @@ void crb_statement_free(struct crb_statement **pstatement)
 		crb_expression_free(&for_statement->condition);
 		crb_expression_free(&for_statement->post);
 
-		struct crb_statement *statement = NULL;
-		for (int i = for_statement->block.statements.count - 1; i >= 0; --i) {
-			crb_stack_read_element(&for_statement->block.statements, &statement, i);
-			crb_statement_free(&statement);
-		}
 		crb_stack_destroy(&for_statement->block.statements);
 	}
 		break;

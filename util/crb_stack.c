@@ -6,12 +6,12 @@
 
 #define CRB_STACK(_t_) ((struct crb_stack *)(_t_))
 
-int crb_stack_init(void *trunk, size_t e_size, unsigned int capacity)
+int crb_stack_init(void *stack, size_t e_size, unsigned int capacity)
 {
-	crb_assert(trunk != NULL, return 1);
+	crb_assert(stack != NULL, return 1);
 	crb_assert(e_size != 0 && capacity != 0, return 1);
 
-	struct crb_stack *t = CRB_STACK(trunk);
+	struct crb_stack *t = CRB_STACK(stack);
 
 	t->data = calloc(e_size, capacity);
 	if (t->data == NULL) {
@@ -25,25 +25,65 @@ int crb_stack_init(void *trunk, size_t e_size, unsigned int capacity)
 	return 0;
 }
 
-void crb_stack_destroy(void *trunk)
+static void destroy_element(void *stack,
+		void *element,
+		unsigned int index,
+		int *stop)
 {
-	if (trunk == NULL) {
+	struct crb_stack *t = CRB_STACK(stack);
+	t->destroy_func(element);
+}
+
+void crb_stack_destroy(void *stack)
+{
+	if (stack == NULL) {
 		return;
 	}
 
-	struct crb_stack *t = CRB_STACK(trunk);
+	struct crb_stack *t = CRB_STACK(stack);
+
+	if (t->destroy_func != NULL) {
+		crb_stack_enumerate(t, t->count, &destroy_element);
+	}
+
 	if (t->data != NULL) {
 		free(t->data);
 	}
 	memset(t, 0, sizeof(*t));
 }
 
-unsigned int crb_stack_append(void *trunk, void *elements, unsigned int count)
+unsigned int crb_stack_enumerate(void *stack,
+		unsigned int count,
+		crb_element_enumerate_func func)
 {
-	crb_assert(trunk != NULL, return 0);
+	crb_assert(stack != NULL, return 0);
+	if (count == 0 || func == NULL) {
+		return 0;
+	}
+
+	struct crb_stack *t = CRB_STACK(stack);
+	count = MIN(count, t->count);
+
+	int stop = 0;
+	unsigned int i = 0;
+	while (i < count) {
+		func(t, t->data + i * t->e_size, i, &stop);
+		++i;
+
+		if (stop != 0) {
+			break;
+		}
+	}
+
+	return i;
+}
+
+unsigned int crb_stack_append(void *stack, void *elements, unsigned int count)
+{
+	crb_assert(stack != NULL, return 0);
 	crb_assert(elements != NULL && count > 0, return 0);
 
-	struct crb_stack *t = CRB_STACK(trunk);
+	struct crb_stack *t = CRB_STACK(stack);
 
 	crb_assert(t->e_size != 0, return -1);
 

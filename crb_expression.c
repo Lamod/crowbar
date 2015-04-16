@@ -125,11 +125,6 @@ void crb_expression_free(struct crb_expression **pexp)
 	case CRB_FUNCTION_EXPRESSION:
 	{
 		struct crb_stack *statements = &exp->u.function_value.block.statements;
-		struct crb_statement *statement = NULL;
-		for (int i = statements->count - 1; i >= 0; --i) {
-			crb_stack_read_element(statements, &statement, i);
-			crb_statement_free(&statement);
-		}
 		crb_stack_destroy(statements);
 
 		crb_stack_destroy(&exp->u.function_value.parameters);
