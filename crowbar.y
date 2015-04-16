@@ -136,7 +136,7 @@ for_statement
 
 		$$ = crb_create_statement(CRB_FOR_STATEMENT, &for_statement);
 	}
-	| FOR expression_opt SEMICOLON expression SEMICOLON expression_opt block
+	| FOR expression_opt SEMICOLON expression_opt SEMICOLON expression_opt block
 	{
 		$7.type = CRB_FOR_STATEMENT_BLOCK;
 		struct crb_for_statement for_statement = {
@@ -152,6 +152,7 @@ for_statement
 expression_opt
 	: /* empty */
 	{
+		$$ = NULL;
 	}
 	| expression
 	;
@@ -282,7 +283,9 @@ argument_list
 function_defination
 	:FUNCTION LP parameter_list RP block
 	{
+		$5.type = CRB_FUNCTION_BLOCK;
 		struct crb_function f = { .parameters = $3, .block = $5 };
+
 		$$ = crb_create_function_expression(f);
 	}
 	;
