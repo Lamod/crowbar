@@ -30,7 +30,7 @@ extern struct crb_interpreter *itp;
 %token 	<expression> TRUE FALSE
 %token 	ADD SUB MUL DIV MOD LP RP LC RC GT GE LT LE EQ NE
 	LOGICAL_AND LOGICAL_OR INVERT ASSIGN SEMICOLON COMMA
-	FUNCTION RETURN IF ELSE FOR
+	FUNCTION RETURN IF ELSE FOR CONTINUE BREAK
 %type 	<expression> expression_opt expression
 	logical_or_expression logical_and_expression
 	equality_expression relational_expression additive_expression
@@ -78,6 +78,14 @@ statement
 	| function_defination_statement
 	| if_statement
 	| for_statement
+	| CONTINUE SEMICOLON
+	{
+		$$ = crb_create_statement(CRB_CONTINUE_STATEMENT, NULL);
+	}
+	| BREAK SEMICOLON
+	{
+		$$ = crb_create_statement(CRB_BREAK_STATEMENT, NULL);
+	}
 	;
 function_defination_statement
 	:FUNCTION IDENTIFIER LP parameter_list RP block
