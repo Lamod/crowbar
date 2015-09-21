@@ -279,21 +279,22 @@ static struct crb_value eval_unary_exp(struct crb_interpreter *itp,
 static struct crb_value eval_assign_exp(struct crb_interpreter *itp,
 		const struct crb_assign_expression *exp)
 {
-	struct crb_value v = crb_eval_exp(itp, exp->exprand);
-	
-	int r = crb_scope_set_variable(itp->top_scope, exp->variable, v);
+	struct crb_variable *var = crb_scope_get_variable(itp->top_scope, exp->variable, 1);
+	assert(var != NULL);
 
+	var->value = crb_eval_exp(itp, exp->exprand);
+	
 	printf("%s %s = (", __func__, exp->variable);
-	crb_value_print(v);
+	crb_value_print(var->value);
 	printf(")\n");
 
-	return r == 0 ? v : CRB_NULL;
+	return var->value;
 }
 
 static struct crb_value eval_identifier_exp(struct crb_interpreter *itp,
 		const char *identifier)
 {
-	struct crb_value v = crb_scope_get_variable(itp->top_scope, identifier, 1);
+	struct crb_value v = crb_scope_get_value(itp->top_scope, identifier, 1);
 
 	printf("%s %s = (", __func__, identifier);
 	crb_value_print(v);
@@ -310,7 +311,7 @@ static struct crb_value eval_function_call_exp(
 		struct crb_interpreter *itp,
 		const struct crb_function_call_expression *fe)
 {
-	struct crb_value func_value = crb_scope_get_variable(
+	struct crb_value func_value = crb_scope_get_value(
 			itp->top_scope,
 			fe->function_name, 1);
 	if (!crb_is_function_value(func_value)) {
@@ -330,7 +331,7 @@ static struct crb_value eval_function_call_exp(
 		crb_stack_read_element(&func->parameters, &name, i);
 		crb_stack_read_element(&fe->arguments, &exp, i);
 
-		crb_scope_set_variable(scope, name, crb_eval_exp(itp, exp));
+		crb_scope_push_variable(scope, name, crb_eval_exp(itp, exp));
 	}
 
 	struct crb_value r = crb_exec_block(itp, &func->block);

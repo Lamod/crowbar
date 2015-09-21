@@ -29,11 +29,25 @@ static struct crb_block_result exec_statement(
 {
 	printf("%s statement: %p %d\n", __func__, statement, statement->type);
 
-	struct crb_block_result result = {0};
+	struct crb_block_result result = { .value = CRB_NULL };
 
 	switch (statement->type) {
 	case CRB_EXP_STATEMENT:
 		result.value = crb_eval_exp(itp, statement->u.exp_statement.expression);
+		break;
+	case CRB_DEFINE_STATEMENT:
+	{
+		struct crb_stack *exps = &statement->u.define_statement.expressions;
+		struct crb_expression *exp = NULL;
+		struct crb_assign_expression *assign = NULL;
+		for (int i = 0; i < exps->count; ++i) {
+			exp = ((struct crb_expression **)exps->data)[i];
+			assign = &exp->u.assign_expression;
+			struct crb_value v = crb_eval_exp(itp, assign->exprand);
+			int r = crb_scope_push_variable(itp->top_scope, assign->variable, v);
+			assert(!r);
+		}
+	}
 		break;
 	case CRB_IF_STATEMENT:
 	{

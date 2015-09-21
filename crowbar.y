@@ -18,6 +18,7 @@ extern struct crb_interpreter *itp;
 	struct crb_expression *expression;
 	struct crb_statement *statement;
 
+	struct crb_stack define_expressions;
 	struct crb_stack parameters;
 	struct crb_stack statements;
 	struct crb_stack arguments;
@@ -30,18 +31,19 @@ extern struct crb_interpreter *itp;
 %token 	<expression> TRUE FALSE
 %token 	ADD SUB MUL DIV MOD LP RP LC RC GT GE LT LE EQ NE
 	LOGICAL_AND LOGICAL_OR INVERT ASSIGN SEMICOLON COMMA
-	FUNCTION RETURN IF ELSE FOR CONTINUE BREAK
-%type 	<expression> expression_opt expression
+	FUNCTION RETURN IF ELSE FOR CONTINUE BREAK VAR
+%type 	<expression> expression_opt expression assignment_expression
 	logical_or_expression logical_and_expression
 	equality_expression relational_expression additive_expression
 	multiplicative_expression unary_expression primary_expression
-	function_defination
+	function_defination define_expression
 %type	<statement> statement function_defination_statement if_statement
 	for_statement
 %type	<statements> statement_list
 %type	<block> block global_block
 %type	<parameters> parameter_list
 %type	<arguments> argument_list
+%type	<define_expressions> define_expression_list
 
 %%
 
@@ -73,6 +75,10 @@ statement
 	{
 		$$ = crb_create_exp_statement($1);
 	}
+	| VAR define_expression_list SEMICOLON
+	{
+		$$ = crb_create_define_statement($2);
+	}
 	| RETURN expression SEMICOLON
 	{
 		$$ = crb_create_return_statement($2);
@@ -100,7 +106,11 @@ function_defination_statement
 
 		struct crb_expression *func_exp = crb_create_function_expression(f);
 		struct crb_expression *assign_exp = crb_create_assign_expression($2, func_exp);
-		$$ = crb_create_exp_statement(assign_exp);
+		struct crb_stack exps = {0};
+		crb_stack_init(&exps, sizeof(assign_exp), 1);
+		crb_stack_append(&exps, &assign_exp, 1);
+		
+		$$ = crb_create_define_statement(exps);
 	}
 	;
 if_statement
@@ -160,7 +170,30 @@ expression_opt
 	;
 expression
 	: logical_or_expression
-	| IDENTIFIER ASSIGN expression
+	| assignment_expression
+	;
+define_expression_list
+	: define_expression
+	{
+		crb_stack_init(&$$, sizeof($1), 1);
+		crb_stack_append(&$$, &$1, 1);
+	}
+	| define_expression_list COMMA define_expression
+	{
+		crb_stack_append(&$1, &$3, 1);
+		$$ = $1;
+	}
+	;
+define_expression
+	: IDENTIFIER
+	{
+		struct crb_expression *exprand = crb_create_null_expression();
+		$$ = crb_create_assign_expression($1, exprand);
+	}
+	| assignment_expression
+	;
+assignment_expression
+	: IDENTIFIER ASSIGN expression
 	{
 		$$ = crb_create_assign_expression($1, $3);
 	}

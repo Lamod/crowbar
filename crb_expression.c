@@ -5,7 +5,7 @@
 #include "crb_statement.h"
 
 static char *exp_type_desc[] = {
-	"NONE", "BOOL", "INT", "DOUBLE", "STRING", "FUNCTION",
+	"NONE", "NULL", "BOOL", "INT", "DOUBLE", "STRING", "FUNCTION",
 	"IDENTIFIER", "FUNCTION_CALL", "BINARY", "ASSIGN", "UNARY",
 };
 
@@ -36,6 +36,11 @@ struct crb_expression *crb_create_expression(int type, void *value)
 	printf("%s t:%s v:", __func__, exp_type_desc[type]);
 
 	switch (type) {
+	case CRB_NULL_EXPRESSION:
+	{
+		printf("null\n");
+	}
+		break;
 	case CRB_BOOLEAN_EXPRESSION:
 	{
 		printf("%d\n", V(int));

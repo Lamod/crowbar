@@ -5,53 +5,54 @@
 #include <string.h>
 #include <stdio.h>
 
-int crb_scope_set_variable(struct crb_scope *scope,
-		const char *variable, struct crb_value value)
+int crb_scope_push_variable(struct crb_scope *scope,
+		const char *name, struct crb_value value)
 {
-	crb_assert(scope != NULL && variable != NULL, return -1);
-
-	printf("%s scope<%p> %s = ", __func__, scope, variable);
+	if (crb_scope_get_variable(scope, name, 0)) {
+		return 1;
+	}
+		
+	printf("%s scope<%p> %s = ", __func__, scope, name);
 	crb_value_print(value);
 	printf("\n");
 
-	struct crb_variable *pvar = NULL;
-	for (int i = scope->variables.count - 1; i >= 0; --i) {
-		pvar = (struct crb_variable *)scope->variables.data + i;
-		if (strcmp(variable, pvar->identifier) != 0) {
-			continue;
-		}
-
-		pvar->value = value;
-		
-		return 0;
-	}
-
 	struct crb_variable var = {
-		.identifier = variable,
+		.identifier = name,
 		.value = value
 	};
 
-	return crb_stack_append(&scope->variables, &var, 1) == 1 ? 0 : 1;
+	return crb_stack_append(&scope->variables, &var, 1) == 1 ? 0 : -1;
 }
 
-struct crb_value crb_scope_get_variable(struct crb_scope *scope,
-		const char *variable, int deep)
+struct crb_variable *crb_scope_get_variable(struct crb_scope *scope,
+		const char *name, int deep)
 {
-	crb_assert(scope != NULL && variable != NULL, return CRB_NULL);
+	crb_assert(scope != NULL && name != NULL, return NULL);
 
 	struct crb_variable *pvar = NULL;
 	for (int i = scope->variables.count - 1; i >= 0; --i) {
 		pvar = (struct crb_variable *)scope->variables.data + i;
 
-		if (strcmp(variable, pvar->identifier) != 0) {
+		if (strcmp(name, pvar->identifier) != 0) {
 			continue;
 		}
 
-		return pvar->value;
+		return pvar;
 	}
 
 	if (deep != 0 && scope->next != NULL) {
-		return crb_scope_get_variable(scope->next, variable, 1);
+		return crb_scope_get_variable(scope->next, name, 1);
+	}
+
+	return NULL;
+}
+
+struct crb_value crb_scope_get_value(struct crb_scope *scope,
+		const char *name, int deep)
+{
+	struct crb_variable *var = crb_scope_get_variable(scope, name, deep);
+	if (var != NULL) {
+		return var->value;
 	}
 
 	return CRB_NULL;
@@ -101,20 +102,20 @@ void crb_interpreter_free(struct crb_interpreter **pitp)
 }
 
 int crb_interpreter_set_global_variable(struct crb_interpreter *itp,
-		const char *variable,
+		const char *name,
 		struct crb_value value)
 {
 	crb_assert(itp != NULL, return -1);
 
-	return crb_scope_set_variable(&itp->global_scope, variable, value);
+	return crb_scope_push_variable(&itp->global_scope, name, value);
 }
 
 struct crb_value crb_interpreter_get_global_variable(struct crb_interpreter *itp,
-		const char *variable)
+		const char *name)
 {
 	crb_assert(itp != NULL, return CRB_NULL);
 
-	return crb_scope_get_variable(&itp->global_scope, variable, 0);
+	return crb_scope_get_value(&itp->global_scope, name, 0);
 }
 
 struct crb_scope *crb_interpreter_push_scope(struct crb_interpreter *itp) 

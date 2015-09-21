@@ -7,6 +7,7 @@
 enum {
 	CRB_STATEMENT_TYPE_NONE,
 	CRB_EXP_STATEMENT,
+	CRB_DEFINE_STATEMENT,
 	CRB_IF_STATEMENT,
 	CRB_FOR_STATEMENT,
 	CRB_CONTINUE_STATEMENT,
@@ -22,6 +23,10 @@ enum {
 	CRB_ELSE_BRANCH_TYPE_NONE,
 	CRB_ELSE_BRANCH,
 	CRB_ELSE_IF_BRANCH
+};
+
+struct crb_define_statement {
+	struct crb_stack expressions;
 };
 
 struct crb_if_statement {
@@ -51,6 +56,7 @@ struct crb_statement {
 	int type;
 	union {
 		struct crb_exp_statement exp_statement;
+		struct crb_define_statement define_statement;
 		struct crb_if_statement if_statement;
 		struct crb_for_statement for_statement;
 		struct crb_return_statement return_statement;
@@ -63,6 +69,11 @@ extern void crb_statement_free(struct crb_statement **pstatement);
 #define crb_create_exp_statement(_e_) ({\
 	struct crb_exp_statement s = { .expression = (_e_) };\
 	crb_create_statement(CRB_EXP_STATEMENT, &s);\
+})
+
+#define crb_create_define_statement(_e_) ({\
+	struct crb_define_statement s = { .expressions = (_e_) };\
+	crb_create_statement(CRB_DEFINE_STATEMENT, &s);\
 })
 
 #define crb_create_return_statement(_e_) ({\

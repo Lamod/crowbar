@@ -20,10 +20,12 @@ struct crb_interpreter {
 	struct crb_scope global_scope, *top_scope;
 };
 
-extern int crb_scope_set_variable(struct crb_scope *scope,
-		const char *variable, struct crb_value value);
-extern struct crb_value crb_scope_get_variable(struct crb_scope *scope,
-		const char *variable, int deep);
+extern int crb_scope_push_variable(struct crb_scope *scope,
+		const char *name, struct crb_value value);
+extern struct crb_variable *crb_scope_get_variable(struct crb_scope *scope,
+		const char *name, int deep);
+extern struct crb_value crb_scope_get_value(struct crb_scope *scope,
+		const char *name, int deep);
 
 extern struct crb_interpreter *crb_create_interpreter(void);
 extern void crb_interpreter_free(struct crb_interpreter **pitp);
@@ -34,9 +36,9 @@ extern struct crb_scope *crb_interpreter_pop_scope(struct crb_interpreter *itp);
 extern struct crb_scope *crb_interpreter_push_scope(struct crb_interpreter *itp);
 
 extern int crb_interpreter_set_global_variable(struct crb_interpreter *itp,
-		const char *variable,
+		const char *name,
 		struct crb_value value);
 extern struct crb_value crb_interpreter_get_global_variable(struct crb_interpreter *itp,
-		const char *variable);
+		const char *name);
 
 #endif //CRB_INTERPRETER_H

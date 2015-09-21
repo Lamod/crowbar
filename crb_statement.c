@@ -3,7 +3,7 @@
 #include "crb_statement.h"
 
 static char *type_desc[] = {
-	"NONE", "EXP", "IF", "FOR", "CONTINUE", "BREAK", "RETURN"
+	"NONE", "EXP", "DEFINE", "IF", "FOR", "CONTINUE", "BREAK", "RETURN"
 };
 
 struct crb_statement *crb_create_statement(int type, void *value)
@@ -25,6 +25,9 @@ struct crb_statement *crb_create_statement(int type, void *value)
 	switch(type) {
 	case CRB_EXP_STATEMENT:
 		SETV(exp_statement);
+		break;
+	case CRB_DEFINE_STATEMENT:
+		SETV(define_statement);
 		break;
 	case CRB_IF_STATEMENT:
 		SETV(if_statement);

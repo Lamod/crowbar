@@ -5,6 +5,7 @@
 
 enum {
 	CRB_EXPRESSION_NONE,
+	CRB_NULL_EXPRESSION,
 	CRB_BOOLEAN_EXPRESSION,
 	CRB_INT_EXPRESSION,
 	CRB_DOUBLE_EXPRESSION,
@@ -101,6 +102,10 @@ struct crb_expression {
 
 extern struct crb_expression *crb_create_expression(int type, void *value);
 extern void crb_expression_free(struct crb_expression **pexp);
+
+#define crb_create_null_expression() ({\
+	crb_create_expression(CRB_NULL_EXPRESSION, NULL);\
+})
 
 #define crb_create_int_expression(_v_) ({\
 	int v = (_v_);\
