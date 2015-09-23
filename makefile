@@ -7,6 +7,7 @@ OBJS=\
      crb_statement.o \
      crb_eval_exp.o \
      crb_exec.o \
+     crb_runtime.o \
      crb_interpreter.o \
      crowbar.tab.o \
      lex.yy.o \
@@ -17,6 +18,7 @@ INCLUDES=\
 	 crb_exec.h \
 	 crb_type.h \
 	 crb_statement.h \
+	 crb_runtime.h \
 	 crb_interpreter.h \
 	 util/crb_stack.h \
 	 util/crb_util.h
@@ -37,6 +39,7 @@ util/crb_stack.o: util/crb_stack.c $(INCLUDES)
 crb_type.o: crb_type.c $(INCLUDES)
 crb_expression.o: crb_expression.c $(INCLUDES)
 crb_statement.o: crb_statement.c $(INCLUDES)
+crb_runtime.o: crb_runtime.c $(INCLUDES)
 crb_interpreter.o: crb_interpreter.c $(INCLUDES)
 crb_eval_exp.o: crb_eval_exp.c $(INCLUDES)
 crb_exec.o: crb_exec.c $(INCLUDES)

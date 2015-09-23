@@ -9,7 +9,7 @@ typedef void(*crb_element_enumerate_func)(void *stack,
 
 #define CRB_STACK_HEADER size_t e_size;\
 	unsigned int capacity, count;\
-	uint8_t *data;\
+	void *data;\
 	crb_element_destroy_func destroy_func;
 
 struct crb_stack {

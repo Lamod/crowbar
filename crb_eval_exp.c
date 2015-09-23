@@ -319,30 +319,47 @@ static struct crb_value eval_function_call_exp(
 	}
 
 	struct crb_function *func = &(func_value.u.function_value);
-	crb_assert(func->parameters.count == fe->arguments.count,
-			return CRB_NULL);
 
-	struct crb_scope *scope = crb_interpreter_push_scope(itp);
+	struct crb_stack args = {0};
+	crb_stack_init(&args, sizeof(struct crb_value), fe->arguments.count);
 
-	const char *name = NULL;
-	const struct crb_expression *exp = NULL;
-
-	for (int i = 0; i < func->parameters.count; ++i) {
-		crb_stack_read_element(&func->parameters, &name, i);
+	struct crb_expression *exp = NULL;
+	struct crb_value v = CRB_NULL;
+	for (int i = 0; i < fe->arguments.count; ++i) {
 		crb_stack_read_element(&fe->arguments, &exp, i);
-
-		crb_scope_push_variable(scope, name, crb_eval_exp(itp, exp));
+		v = crb_eval_exp(itp, exp);
+		crb_stack_append(&args, &v, 1);
 	}
 
-	struct crb_value r = crb_exec_block(itp, &func->block);
+	if (func->is_native_function) {
+		v = func->u.native_function(NULL, args.count, args.data);
+	} else {
+		struct crb_script_function *sf = &func->u.script_function;
+		crb_assert(sf->parameters.count == args.count, return CRB_NULL);
 
-	if (scope != crb_interpreter_pop_scope(itp)) {
-		crb_panic(return CRB_NULL);
+		struct crb_scope *scope = crb_interpreter_push_scope(itp);
+
+		char *name = NULL;
+		struct crb_value v = CRB_NULL;
+		for (int i = 0; i < sf->parameters.count; ++i) {
+			crb_stack_read_element(&sf->parameters, &name, i);
+			crb_stack_read_element(&args, &v, i);
+
+			crb_scope_push_variable(scope, name, v);
+		}
+
+		v = crb_exec_block(itp, &sf->block);
+
+		if (scope != crb_interpreter_pop_scope(itp)) {
+			crb_panic(return CRB_NULL);
+		}
+
+		free(scope);
 	}
-	
-	free(scope);
 
-	return r;
+	crb_stack_destroy(&args);
+
+	return v;
 }
 
 struct crb_value crb_eval_exp(struct crb_interpreter *itp,

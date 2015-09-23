@@ -19,10 +19,6 @@ var div = function(a, b) {
 	}
 };
 
-div(5, 0);
-div(5, 1);
-div(5, 2);
-
 var i, sum = 0;
 for i = 0; i < 10; i = i + 1 {
 	sum = sum + i;
@@ -31,3 +27,7 @@ for i = 0; i < 10; i = i + 1 {
 for sum != 0 {
 	sum = sum - 1;
 }
+
+print("+++++++++++++++");
+print(div(5, 0), div(5, 1), div(5, 2));
+

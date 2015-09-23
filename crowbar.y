@@ -100,8 +100,12 @@ function_defination_statement
 	{
 		$6.type = CRB_FUNCTION_BLOCK;
 		struct crb_function f = {
-			.parameters = $4,
-			.block = $6
+			.u = {
+				.script_function = {
+					.parameters = $4,
+					.block = $6
+				}
+			}
 		};
 
 		struct crb_expression *func_exp = crb_create_function_expression(f);
@@ -319,7 +323,14 @@ function_defination
 	:FUNCTION LP parameter_list RP block
 	{
 		$5.type = CRB_FUNCTION_BLOCK;
-		struct crb_function f = { .parameters = $3, .block = $5 };
+		struct crb_function f = {
+			.u = {
+				.script_function = {
+					.parameters = $3,
+					.block = $5
+				}
+			}
+		};
 
 		$$ = crb_create_function_expression(f);
 	}

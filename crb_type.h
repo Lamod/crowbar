@@ -25,9 +25,20 @@ struct crb_block {
 	struct crb_stack statements;
 };
 
-struct crb_function {
+typedef struct crb_value (*crb_native_function)(void *self,
+		int argc, struct crb_value *argv);
+
+struct crb_script_function {
 	struct crb_stack parameters;
 	struct crb_block block;
+};
+
+struct crb_function {
+	int is_native_function;
+	union {
+		crb_native_function native_function;
+		struct crb_script_function script_function;
+	} u;
 };
 
 enum {

@@ -129,10 +129,11 @@ void crb_expression_free(struct crb_expression **pexp)
 	switch (exp->type) {
 	case CRB_FUNCTION_EXPRESSION:
 	{
-		struct crb_stack *statements = &exp->u.function_value.block.statements;
-		crb_stack_destroy(statements);
-
-		crb_stack_destroy(&exp->u.function_value.parameters);
+		struct crb_function *f = &exp->u.function_value;
+		if (!f->is_native_function) {
+			crb_stack_destroy(&f->u.script_function.block.statements);
+			crb_stack_destroy(&f->u.script_function.parameters);
+		}
 	}
 		break;
 	case CRB_IDENTIFIER_EXPRESSION:

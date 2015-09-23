@@ -3,6 +3,7 @@
 #include "crb_type.h"
 #include "crb_expression.h"
 #include "crb_interpreter.h"
+#include "crb_runtime.h"
 #include "crowbar.tab.h"
 
 extern FILE *yyin;
@@ -20,6 +21,7 @@ int main(int argc, char *argv[])
 	yyin = fp;
 
 	itp = crb_create_interpreter();
+	crb_setup_interpreter(itp);
 
 	yyparse();
 
