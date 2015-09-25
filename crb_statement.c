@@ -53,13 +53,8 @@ struct crb_statement *crb_create_statement(int type, void *value)
 	return s;
 }
 
-void crb_statement_free(struct crb_statement **pstatement)
+void crb_statement_destroy(struct crb_statement *statement)
 {
-	if (pstatement == NULL) {
-		return;
-	}
-
-	struct crb_statement *statement = *pstatement;
 	if (statement == NULL) {
 		return;
 	}
@@ -104,7 +99,20 @@ void crb_statement_free(struct crb_statement **pstatement)
 	default:
 		break;
 	}
+}
 
+void crb_statement_free(struct crb_statement **pstatement)
+{
+	if (pstatement == NULL) {
+		return;
+	}
+
+	struct crb_statement *statement = *pstatement;
+	if (statement == NULL) {
+		return;
+	}
+
+	crb_statement_destroy(statement);
 	free(statement);
 	*pstatement = NULL;
 }

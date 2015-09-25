@@ -5,6 +5,17 @@
 #include <string.h>
 #include <stdio.h>
 
+static void crb_variable_destroy(struct crb_variable *var)
+{
+	if (var == NULL) {
+		return;
+	}
+
+	crb_assert(var->identifier, return);
+	free(var->identifier);
+	crb_value_destroy(&var->value);
+}
+
 int crb_scope_push_variable(struct crb_scope *scope,
 		const char *name, struct crb_value value)
 {
@@ -65,9 +76,10 @@ struct crb_interpreter *crb_create_interpreter(void)
 		return NULL;
 	}
 
-	itp->top_scope = &(itp->global_scope);
-
 	crb_stack_init(&itp->global_scope, sizeof(struct crb_variable), 50);
+	itp->global_scope.variables.destroy_func = crb_variable_destroy;
+
+	itp->top_scope = &(itp->global_scope);
 
 	return itp;
 }
@@ -92,12 +104,13 @@ void crb_interpreter_free(struct crb_interpreter **pitp)
 	struct crb_scope *scope = NULL;
 	while (itp->top_scope != &itp->global_scope) {
 		scope = crb_interpreter_pop_scope(itp);
-		crb_stack_destroy(scope);
+		crb_stack_destroy(&scope->variables);
 		free(scope);
 	}
-	crb_stack_destroy(&itp->global_scope);
+	crb_stack_destroy(&itp->global_scope.variables);
 
 	free(itp);
+
 	*pitp = NULL;
 }
 
@@ -120,8 +133,11 @@ struct crb_value crb_interpreter_get_global_variable(struct crb_interpreter *itp
 
 struct crb_scope *crb_interpreter_push_scope(struct crb_interpreter *itp) 
 {
+	crb_assert(itp, return NULL);
+
 	struct crb_scope *s = calloc(sizeof(*s), 1);
 	crb_stack_init(&s->variables, sizeof(struct crb_variable), 10);
+	s->variables.destroy_func = crb_variable_destroy;
 
 	s->next = itp->top_scope;
 	itp->top_scope = s;

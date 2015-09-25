@@ -115,13 +115,8 @@ struct crb_expression *crb_create_expression(int type, void *value)
 	return e;
 }
 
-void crb_expression_free(struct crb_expression **pexp)
+void crb_expression_destroy(struct crb_expression *exp)
 {
-	if (pexp == NULL) {
-		return;
-	}
-
-	struct crb_expression *exp = *pexp;
 	if (exp == NULL) {
 		return;
 	}
@@ -153,6 +148,20 @@ void crb_expression_free(struct crb_expression **pexp)
 	default:
 		break;
 	}
+}
+
+void crb_expression_free(struct crb_expression **pexp)
+{
+	if (pexp == NULL) {
+		return;
+	}
+
+	struct crb_expression *exp = *pexp;
+	if (exp == NULL) {
+		return;
+	}
+
+	crb_expression_destroy(exp);
 
 	free(exp);
 	*pexp = NULL;

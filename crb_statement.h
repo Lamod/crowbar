@@ -64,6 +64,7 @@ struct crb_statement {
 };
 
 extern struct crb_statement *crb_create_statement(int type, void *value);
+extern void crb_statement_destroy(struct crb_statement *statement);
 extern void crb_statement_free(struct crb_statement **pstatement);
 
 #define crb_create_exp_statement(_e_) ({\

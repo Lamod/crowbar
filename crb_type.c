@@ -26,9 +26,26 @@ size_t crb_string_append_chars(struct crb_string *str, char *chars)
 	return r;
 }
 
-struct crb_function *crb_create_function(void)
+void crb_value_destroy(struct crb_value *v)
 {
-	return calloc(sizeof(struct crb_function), 1);
+	crb_assert(v, return);
+
+	switch(v->type) {
+	case CRB_STRING_VALUE:
+		free(v->u.string_value.data);
+		return;
+	case CRB_FUNCTION_VALUE:
+		if (v->u.function_value.is_native_function) {
+			return;
+		}
+
+		struct crb_script_function *sf = &v->u.function_value.u.script_function;
+		crb_stack_destroy(&sf->parameters);
+		crb_stack_destroy(&sf->block.statements);
+		return;
+	default:
+		return;
+	}
 }
 
 void crb_value_print(struct crb_value v)

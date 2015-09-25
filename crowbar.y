@@ -10,6 +10,11 @@
 
 extern struct crb_interpreter *itp;
 
+void free_identifier(void **pid)
+{
+	free(*pid);
+}
+
 %}
 
 %union {
@@ -59,7 +64,7 @@ statement_list
 	:statement
 	{
 		crb_stack_init(&$$, sizeof($1), 1);
-		$$.destroy_func = (crb_element_destroy_func)&crb_statement_free;
+		$$.destroy_func = crb_statement_free;
 
 		crb_stack_append(&$$, &$1, 1);
 	}
@@ -112,6 +117,8 @@ function_defination_statement
 		struct crb_expression *assign_exp = crb_create_assign_expression($2, func_exp);
 		struct crb_stack exps = {0};
 		crb_stack_init(&exps, sizeof(assign_exp), 1);
+		exps.destroy_func = crb_expression_free;
+
 		crb_stack_append(&exps, &assign_exp, 1);
 		
 		$$ = crb_create_define_statement(exps);
@@ -180,6 +187,7 @@ define_expression_list
 	: define_expression
 	{
 		crb_stack_init(&$$, sizeof($1), 1);
+		$$.destroy_func = crb_expression_free;
 		crb_stack_append(&$$, &$1, 1);
 	}
 	| define_expression_list COMMA define_expression
@@ -311,6 +319,7 @@ argument_list
 	:expression
 	{
 		crb_stack_init(&$$, sizeof($1), 1);
+		$$.destroy_func = crb_expression_free;
 		crb_stack_append(&$$, &$1, 1);
 	}
 	|argument_list COMMA expression
@@ -339,6 +348,7 @@ parameter_list
 	:IDENTIFIER
 	{
 		crb_stack_init(&$$, sizeof($1), 1);
+		$$.destroy_func = free_identifier;
 		crb_stack_append(&$$, &$1, 1);
 	}
 	|parameter_list COMMA IDENTIFIER

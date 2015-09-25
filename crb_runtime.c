@@ -1,6 +1,7 @@
 #include "crb_runtime.h"
 #include "util/crb_util.h"
 #include <stdio.h>
+#include <string.h>
 
 int crb_add_gloabl_function(struct crb_interpreter *itp,
 		char *name, crb_native_function func)
@@ -27,7 +28,7 @@ int crb_setup_interpreter(struct crb_interpreter *itp)
 {
 	crb_assert(itp != NULL, return -1);
 
-	return crb_add_gloabl_function(itp, "print", crb_print);
+	return crb_add_gloabl_function(itp, strdup("print"), crb_print);
 }
 
 struct crb_value crb_print(void *self, int argc, struct crb_value *args)

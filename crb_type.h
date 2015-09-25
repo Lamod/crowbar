@@ -61,6 +61,7 @@ struct crb_value {
 	} u;
 };
 
+extern void crb_value_destroy(struct crb_value *v);
 extern void crb_value_print(struct crb_value v);
 
 #define CRB_NULL ((struct crb_value){0})
