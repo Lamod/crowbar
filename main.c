@@ -25,10 +25,6 @@ int main(int argc, char *argv[])
 
 	yyparse();
 
-	printf("----------------------------\n");
-	printf("parsing finished, start executing\n");
-	printf("----------------------------\n");
-
 	crb_interpreter_run(itp);
 
 	crb_interpreter_free(&itp);

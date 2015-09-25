@@ -6,14 +6,6 @@
 
 #define expand_binary_numberical_exp(_l_, _r_, _o_) ({\
 	struct crb_value _l = (_l_), _r = (_r_), _v = CRB_NULL;\
-	printf("%s (", __func__);\
-	crb_value_print(_l);\
-	printf(")");\
-	printf(" %s ", #_o_);\
-	printf("(");\
-	crb_value_print(_r);\
-	printf(")");\
-	\
 	if (_l.type == CRB_DOUBLE_VALUE) {\
 		_v.type = CRB_DOUBLE_VALUE;\
 		if (_r.type == CRB_DOUBLE_VALUE) {\
@@ -30,10 +22,6 @@
 		_v.type = CRB_INT_VALUE;\
 		_v.u.int_value = _l.u.int_value _o_ _r.u.int_value;\
 	}\
-	printf(" = (");\
-	crb_value_print(_v);\
-	printf(")\n");\
-	\
 	_v;\
 })
 
@@ -129,9 +117,6 @@ static struct crb_value eval_equality_exp(struct crb_interpreter *itp,
 		assert(0);
 	}
 
-	printf("%s ", __func__);
-	crb_value_print(v);
-	printf("\n");
 	return v;
 }
 
@@ -155,10 +140,6 @@ static struct crb_value eval_logical_exp(struct crb_interpreter *itp,
 	} else {
 		v.u.boolean_value = left.u.boolean_value || right.u.boolean_value;
 	}
-
-	printf("%s ", __func__);
-	crb_value_print(v);
-	printf("\n");
 
 	return v;
 }
@@ -269,10 +250,6 @@ static struct crb_value eval_unary_exp(struct crb_interpreter *itp,
 		break;
 	}
 
-	printf("%s ", __func__);
-	crb_value_print(v);
-	printf("\n");
-
 	return v;
 }
 
@@ -284,10 +261,6 @@ static struct crb_value eval_assign_exp(struct crb_interpreter *itp,
 
 	var->value = crb_eval_exp(itp, exp->exprand);
 	
-	printf("%s %s = (", __func__, exp->variable);
-	crb_value_print(var->value);
-	printf(")\n");
-
 	return var->value;
 }
 
@@ -296,10 +269,6 @@ static struct crb_value eval_identifier_exp(struct crb_interpreter *itp,
 {
 	struct crb_value v = crb_scope_get_value(itp->top_scope, identifier, 1);
 
-	printf("%s %s = (", __func__, identifier);
-	crb_value_print(v);
-	printf(")\n");
-	
 	if (crb_is_null(v)) {
 		assert(0);
 	}
@@ -365,7 +334,6 @@ static struct crb_value eval_function_call_exp(
 struct crb_value crb_eval_exp(struct crb_interpreter *itp,
 		const struct crb_expression *exp)
 {
-	printf("%s %p %p %d\n", __func__, itp, exp, exp->type);
 	crb_assert(itp != NULL && exp != NULL, return CRB_NULL);
 	crb_assert(crb_expression_type_is_valid(exp->type),
 			return CRB_NULL);

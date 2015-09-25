@@ -20,7 +20,6 @@ static char *unary_operator_desc[] = {
 
 struct crb_expression *crb_create_expression(int type, void *value)
 {
-	printf("%s %d %p\n", __func__, type, value);
 	crb_assert(crb_expression_type_is_valid(type), return NULL);
 
 	struct crb_expression *e = malloc(sizeof(struct crb_expression));
@@ -33,76 +32,38 @@ struct crb_expression *crb_create_expression(int type, void *value)
 #define V(_t_) (*((_t_ *)value))
 #define SETV(_f_) (e->u._f_ = V(typeof(e->u._f_)))
 
-	printf("%s t:%s v:", __func__, exp_type_desc[type]);
-
 	switch (type) {
 	case CRB_NULL_EXPRESSION:
-	{
-		printf("null\n");
-	}
 		break;
 	case CRB_BOOLEAN_EXPRESSION:
-	{
-		printf("%d\n", V(int));
 		SETV(boolean_value);
-	}
 		break;
 	case CRB_INT_EXPRESSION:
-	{
-		printf("%d\n", V(int));
 		SETV(int_value);
-	}
 		break;
 	case CRB_DOUBLE_EXPRESSION:
-	{
-		printf("%lf\n", V(double));
 		SETV(double_value);
-	}
 		break;
 	case CRB_STRING_EXPRESSION:
-	{
-		printf("%s\n", (V(struct crb_string)).data);
 		SETV(string_value);
-	}
 		break;
 	case CRB_BINARY_EXPRESSION:
-	{
-		int opr = ((struct crb_binary_expression *)value)->binary_operator;
-		printf("<%s>\n", binary_operator_desc[opr]);
 		SETV(binary_expression);
-	}
 		break;
 	case CRB_ASSIGN_EXPRESSION:
-	{
-		struct crb_assign_expression *ae = (struct crb_assign_expression *)value;
-		printf("%s = <%p>\n", ae->variable, ae->exprand);
 		SETV(assign_expression);
-	}
 		break;
 	case CRB_UNARY_EXPRESSION:
-	{
-		int opr = ((struct crb_unary_expression *)value)->unary_operator;
-		printf("<%s>\n", unary_operator_desc[opr]);
 		SETV(unary_expression);
-	}
 		break;
 	case CRB_IDENTIFIER_EXPRESSION:
-	{
-		printf("%s\n", V(const char *));
 		SETV(identifier);
-	}
 		break;
 	case CRB_FUNCTION_EXPRESSION:
-	{
-		printf("\n");
 		SETV(function_value);
-	}
 		break;
 	case CRB_FUNCTION_CALL_EXPRESSION:
-	{
-		printf("%s()\n", ((struct crb_function_call_expression *)value)->function_name);
 		SETV(function_call_expression);
-	}
 		break;
 	default:
 		assert(0);

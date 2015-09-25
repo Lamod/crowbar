@@ -22,10 +22,6 @@ int crb_scope_push_variable(struct crb_scope *scope,
 	if (crb_scope_get_variable(scope, name, 0)) {
 		return 1;
 	}
-		
-	printf("%s scope<%p> %s = ", __func__, scope, name);
-	crb_value_print(value);
-	printf("\n");
 
 	struct crb_variable var = {
 		.identifier = name,

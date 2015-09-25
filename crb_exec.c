@@ -27,8 +27,6 @@ static struct crb_block_result exec_statement(
 		struct crb_interpreter *itp,
 		struct crb_statement *statement)
 {
-	printf("%s statement: %p %d\n", __func__, statement, statement->type);
-
 	struct crb_block_result result = { .value = CRB_NULL };
 
 	switch (statement->type) {
@@ -143,10 +141,6 @@ static struct crb_block_result exec_block(
 			break;
 		}
 	}
-
-	printf("%s %d ", __func__, block->type);
-	crb_value_print(result.value);
-	printf("\n");
 
 	return result;
 }
