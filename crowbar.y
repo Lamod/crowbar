@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include "crb_type.h"
+#include "crb_struct.h"
 #include "crb_expression.h"
 #include "crb_statement.h"
 #include "crb_eval_exp.h"
@@ -36,7 +37,7 @@ void free_identifier(void **pid)
 %token 	<expression> TRUE FALSE
 %token 	ADD SUB MUL DIV MOD LP RP LC RC GT GE LT LE EQ NE
 	LOGICAL_AND LOGICAL_OR INVERT ASSIGN SEMICOLON COMMA
-	FUNCTION RETURN IF ELSE FOR CONTINUE BREAK VAR
+	FUNCTION RETURN IF ELSE FOR CONTINUE BREAK VAR STRUCT
 %type 	<expression> expression_opt expression assignment_expression
 	logical_or_expression logical_and_expression
 	equality_expression relational_expression additive_expression
@@ -83,6 +84,14 @@ statement
 	| VAR define_expression_list SEMICOLON
 	{
 		$$ = crb_create_define_statement($2);
+	}
+	| STRUCT IDENTIFIER LC parameter_list RC SEMICOLON
+	{
+		struct crb_struct strct;
+		crb_struct_init(&strct, $2, &($4));
+		crb_interpreter_push_struct(itp, &strct);
+		
+		$$ = crb_create_struct_statement($2);
 	}
 	| RETURN expression SEMICOLON
 	{
@@ -337,6 +346,19 @@ function_defination
 				.script_function = {
 					.parameters = $3,
 					.block = $5
+				}
+			}
+		};
+
+		$$ = crb_create_function_expression(f);
+	}
+	|FUNCTION LP RP block
+	{
+		$4.type = CRB_FUNCTION_BLOCK;
+		struct crb_function f = {
+			.u = {
+				.script_function = {
+					.block = $4
 				}
 			}
 		};

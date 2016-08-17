@@ -8,7 +8,7 @@ static char *type_desc[] = {
 
 struct crb_statement *crb_create_statement(int type, void *value)
 {
-	crb_assert(type <= CRB_RETURN_STATEMENT, return NULL);
+	crb_assert(type <= CRB_STRUCT_STATEMENT, return NULL);
 
 	struct crb_statement *s = malloc(sizeof(struct crb_statement));
 	if (s == NULL) {
@@ -39,6 +39,9 @@ struct crb_statement *crb_create_statement(int type, void *value)
 		break;
 	case CRB_RETURN_STATEMENT:
 		SETV(return_statement);
+		break;
+	case CRB_STRUCT_STATEMENT:
+		SETV(struct_statement);
 		break;
 	default:
 		assert(0);

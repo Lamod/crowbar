@@ -51,6 +51,7 @@ FLOAT (0?|{INTEGER})\.[0-9]+
 <INITIAL>"continue"	return CONTINUE;
 <INITIAL>"break"	return BREAK;
 <INITIAL>"var"		return VAR;
+<INITIAL>"struct"	return STRUCT;
 <INITIAL>"true" {
 	yylval.expression = crb_create_boolean_expression(1);
 

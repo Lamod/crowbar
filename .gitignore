@@ -1,0 +1,6 @@
+*.swp
+*.o
+crowbar.tab.*
+crowbar.output
+lex.yy.c
+crowbar

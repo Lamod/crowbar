@@ -13,6 +13,7 @@ enum {
 	CRB_CONTINUE_STATEMENT,
 	CRB_BREAK_STATEMENT,
 	CRB_RETURN_STATEMENT,
+	CRB_STRUCT_STATEMENT
 };
 
 struct crb_exp_statement {
@@ -52,6 +53,10 @@ struct crb_return_statement {
 	struct crb_expression *expression;
 };
 
+struct crb_struct_statement {
+	const char *name;
+};
+
 struct crb_statement {
 	int type;
 	union {
@@ -60,6 +65,7 @@ struct crb_statement {
 		struct crb_if_statement if_statement;
 		struct crb_for_statement for_statement;
 		struct crb_return_statement return_statement;
+		struct crb_struct_statement struct_statement;
 	} u;
 };
 
@@ -81,5 +87,10 @@ extern void crb_statement_free(struct crb_statement **pstatement);
 	struct crb_return_statement s = { .expression = (_e_) };\
 	crb_create_statement(CRB_RETURN_STATEMENT, &s);\
 })
+
+#define crb_create_struct_statement(_n_) ({\
+	struct crb_struct_statement s = { .name = (_n_) };\
+	crb_create_statement(CRB_STRUCT_STATEMENT, &s);\
+})\
 
 #endif //CRB_STATEMENT_H

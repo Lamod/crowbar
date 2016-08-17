@@ -77,6 +77,8 @@ struct crb_interpreter *crb_create_interpreter(void)
 
 	itp->top_scope = &(itp->global_scope);
 
+	crb_stack_init(&itp->structs, sizeof(struct crb_struct), 10);
+
 	return itp;
 }
 
@@ -105,6 +107,10 @@ void crb_interpreter_free(struct crb_interpreter **pitp)
 	}
 	crb_stack_destroy(&itp->global_scope.variables);
 
+	// structs
+	
+	crb_stack_destroy(&itp->structs);
+
 	free(itp);
 
 	*pitp = NULL;
@@ -125,6 +131,27 @@ struct crb_value crb_interpreter_get_global_variable(struct crb_interpreter *itp
 	crb_assert(itp != NULL, return CRB_NULL);
 
 	return crb_scope_get_value(&itp->global_scope, name, 0);
+}
+
+int crb_interpreter_push_struct(struct crb_interpreter *itp,
+		struct crb_struct *strct)
+{
+	return crb_stack_append(&(itp->structs), strct, 1);
+}
+
+struct crb_struct *crb_interpreter_get_struct(
+		struct crb_interpreter *itp, const char *name)
+{
+	struct crb_stack *ss = &(itp->structs);
+	struct crb_struct *s = NULL;
+	for (unsigned int i = 0; i < ss->count; ++i) {
+		s = (typeof(s))(ss->data) + i;
+		if (strcmp(s->name, name) == 0) {
+			return s;
+		}
+	}
+
+	return NULL;
 }
 
 struct crb_scope *crb_interpreter_push_scope(struct crb_interpreter *itp) 

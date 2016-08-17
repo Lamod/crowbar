@@ -4,6 +4,8 @@
 #include "util/crb_stack.h"
 #include <stdlib.h>
 
+struct crb_instance;
+
 struct crb_string {
 	CRB_STACK_HEADER;
 };
@@ -47,6 +49,7 @@ enum {
 	CRB_INT_VALUE,
 	CRB_DOUBLE_VALUE,
 	CRB_STRING_VALUE,
+	CRB_INSTANCE_VALUE,
 	CRB_FUNCTION_VALUE,
 };
 
@@ -57,6 +60,7 @@ struct crb_value {
 		int int_value;
 		double float_value;
 		struct crb_string string_value;
+		struct crb_instance *instance_value;
 		struct crb_function function_value;
 	} u;
 };
@@ -64,7 +68,7 @@ struct crb_value {
 extern void crb_value_destroy(struct crb_value *v);
 extern void crb_value_print(struct crb_value v);
 
-#define CRB_NULL ((struct crb_value){0})
+extern struct crb_value CRB_NULL;
 
 #define crb_is_null(_v_) ((_v_).type == CRB_NULL_VALUE)
 
@@ -76,6 +80,8 @@ extern void crb_value_print(struct crb_value v);
 		|| (_v_).type == CRB_DOUBLE_VALUE)
 
 #define crb_is_string_value(_v_) ((_v_).type == CRB_STRING_VALUE)
+
+#define crb_is_struct_value(_v_) ((_v_).type == CRB_STRUCT_VALUE)
 
 #define crb_is_function_value(_v_) ((_v_).type == CRB_FUNCTION_VALUE) 
 

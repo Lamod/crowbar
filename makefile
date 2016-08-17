@@ -3,6 +3,7 @@ CC=clang
 OBJS=\
      util/crb_stack.o \
      crb_type.o \
+	 crb_struct.o \
      crb_expression.o \
      crb_statement.o \
      crb_eval_exp.o \
@@ -17,6 +18,7 @@ INCLUDES=\
 	 crb_eval_exp.h \
 	 crb_exec.h \
 	 crb_type.h \
+	 crb_struct.h \
 	 crb_statement.h \
 	 crb_runtime.h \
 	 crb_interpreter.h \
@@ -37,6 +39,7 @@ crowbar.tab.o: crowbar.y
 
 util/crb_stack.o: util/crb_stack.c $(INCLUDES)
 crb_type.o: crb_type.c $(INCLUDES)
+crb_struct.o: crb_struct.c $(INCLUDES)
 crb_expression.o: crb_expression.c $(INCLUDES)
 crb_statement.o: crb_statement.c $(INCLUDES)
 crb_runtime.o: crb_runtime.c $(INCLUDES)
