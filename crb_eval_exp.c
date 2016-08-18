@@ -359,7 +359,7 @@ static struct crb_value *get_field(struct crb_interpreter *itp,
 		struct crb_member_expression *me) {
 
 	struct crb_value instance = crb_eval_exp(itp, me->instance);
-	crb_assert(instance.type == CRB_MEMBER_EXPRESSION, return NULL);
+	crb_assert(instance.type == CRB_INSTANCE_VALUE, return NULL);
 
 	return crb_instance_get(instance.u.instance_value, me->field);
 }
