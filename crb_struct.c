@@ -60,10 +60,10 @@ void crb_instance_free(struct crb_instance *instance) {
 		crb_value_destroy(instance->members + i);
 	}
 
-	free(instance);
+	//free(instance);
 }
 
-struct crb_value *crb_instance_get_field(
+struct crb_value *crb_instance_get(
 		struct crb_instance *instance, const char *field) {
 
 	struct crb_struct *def = instance->definition;

@@ -37,7 +37,7 @@ void free_identifier(void **pid)
 %token 	<expression> TRUE FALSE
 %token 	ADD SUB MUL DIV MOD LP RP LC RC GT GE LT LE EQ NE
 	LOGICAL_AND LOGICAL_OR INVERT ASSIGN SEMICOLON COMMA
-	FUNCTION RETURN IF ELSE FOR CONTINUE BREAK VAR STRUCT
+	FUNCTION RETURN IF ELSE FOR CONTINUE BREAK VAR STRUCT NEW DOT
 %type 	<expression> expression_opt expression assignment_expression
 	logical_or_expression logical_and_expression
 	equality_expression relational_expression additive_expression
@@ -312,8 +312,16 @@ primary_expression
 	{
 		$$ = crb_create_identifier_expression($1);
 	}
+	| expression DOT IDENTIFIER
+	{
+		$$ = crb_create_member_expression($1, $3);
+	}
 	| TRUE
 	| FALSE
+	| NEW IDENTIFIER LP argument_list RP
+	{
+		$$ = crb_create_new_expression($2, &$4);
+	}
 	| IDENTIFIER LP argument_list RP
 	{
 		$$ = crb_create_function_call_expression($1, &$3);

@@ -30,7 +30,7 @@ FLOAT (0?|{INTEGER})\.[0-9]+
 <INITIAL>"||"           return LOGICAL_OR;
 <INITIAL>"="            return ASSIGN;
 <INITIAL>"=="           return EQ;
-<INITIAL>"!"		return INVERT;
+<INITIAL>"!"			return INVERT;
 <INITIAL>"!="           return NE;
 <INITIAL>">"            return GT;
 <INITIAL>">="           return GE;
@@ -43,6 +43,7 @@ FLOAT (0?|{INTEGER})\.[0-9]+
 <INITIAL>"%"            return MOD;
 <INITIAL>";"		return SEMICOLON;
 <INITIAL>","		return COMMA;
+<INITIAL>"."		return DOT;
 <INITIAL>"function"	return FUNCTION;
 <INITIAL>"return"	return RETURN;
 <INITIAL>"if"		return IF;
@@ -52,6 +53,7 @@ FLOAT (0?|{INTEGER})\.[0-9]+
 <INITIAL>"break"	return BREAK;
 <INITIAL>"var"		return VAR;
 <INITIAL>"struct"	return STRUCT;
+<INITIAL>"new"		return NEW;
 <INITIAL>"true" {
 	yylval.expression = crb_create_boolean_expression(1);
 

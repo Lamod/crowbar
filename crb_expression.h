@@ -10,6 +10,8 @@ enum {
 	CRB_INT_EXPRESSION,
 	CRB_DOUBLE_EXPRESSION,
 	CRB_STRING_EXPRESSION,
+	CRB_NEW_EXPRESSION,
+	CRB_MEMBER_EXPRESSION,
 	CRB_FUNCTION_EXPRESSION,
 	CRB_IDENTIFIER_EXPRESSION,
 	CRB_FUNCTION_CALL_EXPRESSION,
@@ -48,6 +50,16 @@ struct crb_function_call_expression {
 	const struct crb_stack arguments;
 };
 
+struct crb_new_expression {
+	const char *struct_name;
+	const struct crb_stack arguments;
+};
+
+struct crb_member_expression {
+	struct crb_expression *instance;
+	const char *field;
+};
+
 struct crb_binary_expression {
 	const int binary_operator;
 	const struct crb_expression *left, *right;
@@ -72,6 +84,8 @@ struct crb_expression {
 		struct crb_string string_value;
 		struct crb_function function_value;
 		const char *identifier;
+		struct crb_new_expression new_expression;
+		struct crb_member_expression member_expression;
 		struct crb_function_call_expression function_call_expression;
 		struct crb_binary_expression binary_expression;
 		struct crb_assign_expression assign_expression;
@@ -137,6 +151,13 @@ extern void crb_expression_free(struct crb_expression **pexp);
 	struct crb_function _v = (_v_);\
 	crb_create_expression(CRB_FUNCTION_EXPRESSION, &_v);\
 })
+
+extern struct crb_expression *crb_create_new_expression(
+		const char *struct_name,
+		const struct crb_stack *arguments);
+
+extern struct crb_expression *crb_create_member_expression(
+		struct crb_expression *instance, const char *field);
 
 extern struct crb_expression *crb_create_function_call_expression(
 		const char *function,

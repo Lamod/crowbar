@@ -59,6 +59,12 @@ struct crb_expression *crb_create_expression(int type, void *value)
 	case CRB_IDENTIFIER_EXPRESSION:
 		SETV(identifier);
 		break;
+	case CRB_NEW_EXPRESSION:
+		SETV(new_expression);
+		break;
+	case CRB_MEMBER_EXPRESSION:
+		SETV(member_expression);
+		break;
 	case CRB_FUNCTION_EXPRESSION:
 		SETV(function_value);
 		break;
@@ -126,6 +132,33 @@ void crb_expression_free(struct crb_expression **pexp)
 
 	free(exp);
 	*pexp = NULL;
+}
+
+struct crb_expression *crb_create_new_expression(
+		const char *struct_name,
+		const struct crb_stack *arguments)
+{
+	crb_assert(struct_name != NULL, return NULL);
+
+	struct crb_new_expression ne = {
+		.struct_name = struct_name,
+		.arguments = arguments ? *arguments : (struct crb_stack){0}
+	};
+
+	return crb_create_expression(CRB_NEW_EXPRESSION, &ne);
+}
+
+struct crb_expression *crb_create_member_expression(
+		struct crb_expression *instance, const char *field)
+{
+	crb_assert(instance != NULL && field != NULL, return NULL);
+
+	struct crb_member_expression me = {
+		.instance = instance,
+		.field = field
+	};
+
+	return crb_create_expression(CRB_MEMBER_EXPRESSION, &me);
 }
 
 struct crb_expression *crb_create_function_call_expression(

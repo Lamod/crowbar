@@ -1,5 +1,6 @@
 #include "crb_eval_exp.h"
 #include "crb_exec.h"
+#include "crb_struct.h"
 #include "util/crb_util.h"
 #include <stdio.h>
 #include <assert.h>
@@ -331,6 +332,38 @@ static struct crb_value eval_function_call_exp(
 	return v;
 }
 
+static struct crb_instance *new(struct crb_interpreter *itp,
+		const struct crb_new_expression *ne)
+{
+	crb_assert(itp != NULL && ne != NULL, return NULL);
+	crb_assert(ne != NULL, return NULL);
+
+	const struct crb_struct *strct = crb_interpreter_get_struct(itp, ne->struct_name);
+	crb_assert(strct != NULL, return NULL);
+
+	struct crb_instance *instance = crb_instance_new(strct);
+	if (instance == NULL) {
+		return NULL;
+	}
+
+	struct crb_expression *e = NULL;
+	for (unsigned int i = 0; i < ne->arguments.count; ++i) {
+		e = crb_stack_get_element(&ne->arguments, struct crb_expression **, i);
+		instance->members[i] = crb_eval_exp(itp, e);
+	}
+
+	return instance;
+}
+
+static struct crb_value *get_field(struct crb_interpreter *itp,
+		struct crb_member_expression *me) {
+
+	struct crb_value instance = crb_eval_exp(itp, me->instance);
+	crb_assert(instance.type == CRB_MEMBER_EXPRESSION, return NULL);
+
+	return crb_instance_get(instance.u.instance_value, me->field);
+}
+
 struct crb_value crb_eval_exp(struct crb_interpreter *itp,
 		const struct crb_expression *exp)
 {
@@ -356,6 +389,13 @@ struct crb_value crb_eval_exp(struct crb_interpreter *itp,
 	case CRB_STRING_EXPRESSION:
 		v.type = CRB_STRING_VALUE;
 		v.u.string_value = exp->u.string_value;
+		break;
+	case CRB_NEW_EXPRESSION:
+		v.type = CRB_INSTANCE_VALUE;
+		v.u.instance_value = new(itp, &exp->u.new_expression);
+		break;
+	case CRB_MEMBER_EXPRESSION:
+		v = *get_field(itp, &exp->u.member_expression);
 		break;
 	case CRB_FUNCTION_EXPRESSION:
 		v.type = CRB_FUNCTION_VALUE;

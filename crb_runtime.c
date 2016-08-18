@@ -35,10 +35,10 @@ struct crb_value crb_print(void *self, int argc, struct crb_value *args)
 {
 	for (int i = 0; i < argc; ++i) {
 		crb_value_print(args[i]);
-		printf(" ");
+//		printf(" ");
 	}
 
-	printf("\n");
+	//printf("\n");
 
 	struct crb_value v = {
 		.type = CRB_INT_VALUE,
